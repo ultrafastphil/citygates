@@ -1,0 +1,117 @@
+name: CityGates
+main: citygates.main
+version: 1.1
+
+commands:
+  gcreate:
+    description: Create a gate.
+    usage: /<command> [GateName]
+    permission: citygates.admin.gate
+    permission-message: You don't have Permission to create gates.
+ 
+    
+  gp1:
+    description: Select point 1
+    usage: /<command>
+    permission: citygates.admin.p1
+    permission-message: You don't have Permission to create gates.
+    
+  gp2:
+    description: Select point 2
+    usage: /<command>
+    permission: citygates.admin.p2
+    permission-message: You don't have Permission to create gates.  
+    
+  gopen:
+    description: Open Gate
+    usage: /<command> [Gate]
+    permission: citygates.user.open
+    permission-message: You don't have Permission to open gates.
+      
+  gclose:
+    description: Close Gate
+    usage: /<command> [Gate]
+    permission: citygates.user.close
+    permission-message: You don't have Permission to close gates.
+        
+  glist:
+    description: list all the Gates
+    usage: /<command>
+    permission: citygates.user.list
+    permission-message: You don't have Permission to list gates.
+        
+  gremove:
+    description: remove Gate
+    usage: /<command> [Gate]
+    permission: citygates.admin.remove
+    permission-message: You don't have Permission to remove gates.
+        
+  gtimegate:
+    description: Gate open and close by time
+    usage: /<command> [Gate] [true/false]
+    permission: citygates.admin.timegate
+    permission-message: You don't have Permission to add timegate gates.
+    
+  ginfo:
+    description: Info about a gate
+    usage: /<command> [Gate]
+    permission: citygates.user.info
+    permission-message: You don't have Permission to get the info from the gates.
+    
+  gredstone:
+    description: Add or remove redstone listener
+    usage: /<command> [Gate] [true/false] look at the redstone!
+    permission: citygates.admin.redstone
+    permission-message: You don't have Permission to create Gates
+    
+  gkill:
+    description: Gates open when a mob is killed
+    usage: /<command> [Gate] [mob / del] [Kill message]
+    permission: citygates.admin.kill
+    permission-message: You don't have Permissions to do that!
+    
+  clear:
+    description: Clear inventory of you or another player
+    usage: /<command> [Player]
+    permission: citygates.admin.clear
+    permission-message: You don't have Permissions to do that!
+    
+  ghelp:
+    description: Show all the commands!
+    usage: /<command> [number]
+    permission: citygates.user.help
+    permission-messge: you don't have Permissions to this Plugin!
+    
+  gbutton:
+    description: add a button Listener!
+    usage: /<command> [Gate] [true/false] [time delay (in milli seconds)]
+    permissions: citygates.admin.button
+    permission-messge: you don't have Permissions to this Plugin!
+    
+  ggroup:
+    description: Commands for group!
+    usage: /<command>
+    permissions: citygates.admin.group
+    permission-messge: you don't have Permissions to this Plugin!
+  
+  permissions:
+    citygates.admin.*:
+      description: Gives acces to all admin commands
+      children:
+        citygates.admin.p1
+        citygates.admin.p2
+        citygates.admin.gate
+        citygates.admin.remove
+        citygates.admin.timegate
+        citygates.admin.redstone
+        citygates.admin.kill
+        citygates.admin.clear
+        
+    citygates.user.*:
+      description: Gives acces to all user commands
+      children:
+        citygates.user.open
+        citygates.user.close
+        citygates.user.info
+        citygates.user.list
+        citygates.user.help
