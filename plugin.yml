@@ -1,6 +1,9 @@
 name: CityGates
 main: citygates.main
-version: 1.2
+version: 1.7
+dev-url: http://dev.bukkit.org/server-mods/citygates/
+website: http://dev.bukkit.org/server-mods/citygates/
+author: Deahtlykiller
 
 commands:
     gcreate:

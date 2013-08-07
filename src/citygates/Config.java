@@ -12,701 +12,821 @@
 /*     */ import java.io.ObjectOutputStream;
 /*     */ import java.util.ArrayList;
 /*     */ import java.util.logging.Logger;
+/*     */ import javax.swing.JOptionPane;
 /*     */ import org.bukkit.Server;
 /*     */ import org.bukkit.plugin.Plugin;
+/*     */ import org.bukkit.plugin.PluginManager;
 /*     */ 
 /*     */ public class Config
 /*     */ {
 /*     */   public static ArrayList<GateData> LoadGates(Plugin plugin)
 /*     */     throws Exception
 /*     */   {
-/*  11 */     ArrayList gd = new ArrayList();
-/*  12 */     ArrayList ignore = new ArrayList();
-/*  13 */     FileInputStream fis = new FileInputStream("plugins/CityGates/gates.yml");
-/*  14 */     int lines = fis.available();
-/*  15 */     fis.close();
-/*  16 */     if (lines == 0) {
-/*  17 */       throw new IOException("File is empty");
+/*  26 */     ArrayList gd = new ArrayList();
+/*  27 */     ArrayList ignore = new ArrayList();
+/*  28 */     FileInputStream fis = new FileInputStream("plugins/CityGates/gates.yml");
+/*  29 */     int lines = fis.available();
+/*  30 */     fis.close();
+/*  31 */     if (lines == 0) {
+/*  32 */       throw new IOException("File is empty");
 /*     */     }
-/*  19 */     BufferedReader bf = new BufferedReader(new FileReader("plugins/CityGates/gates.yml"));
+/*  34 */     BufferedReader bf = new BufferedReader(new FileReader("plugins/CityGates/gates.yml"));
 /*     */ 
-/*  21 */     int count = 0;
+/*  36 */     int count = 0;
 /*     */     String line;
-/*  22 */     while ((line = bf.readLine()) != null) {
-/*  23 */       count++;
-/*  24 */       if (line.startsWith("Add Gate: ")) {
-/*  25 */         GateData gate = new GateData();
-/*  26 */         gate.name = line.split("Add Gate: ")[1];
-/*  27 */         boolean p1 = false;
-/*  28 */         boolean p2 = false;
-/*  29 */         boolean World = false;
-/*  30 */         while (!(line = bf.readLine()).equals("End Gate")) {
-/*  31 */           count++;
+/*  38 */     while ((line = bf.readLine()) != null)
+/*     */     {
+/*     */       String line;
+/*  39 */       count++;
+/*  40 */       if (line.startsWith("Add Gate: ")) {
+/*  41 */         GateData gate = new GateData();
+/*  42 */         gate.name = line.split("Add Gate: ")[1];
+/*  43 */         boolean p1 = false;
+/*  44 */         boolean p2 = false;
+/*  45 */         boolean World = false;
+/*  46 */         while (!(line = bf.readLine()).equals("End Gate")) {
+/*  47 */           count++;
 /*     */           try {
-/*  33 */             while (line.startsWith(" "))
-/*  34 */               line = line.substring(1);
-/*  35 */             if (line.startsWith("p1: ")) {
-/*  36 */               line = line.split("p1: ")[1];
-/*  37 */               String[] points = line.split(", ");
-/*  38 */               if (points.length == 3)
+/*  49 */             while (line.startsWith(" "))
+/*  50 */               line = line.substring(1);
+/*  51 */             if (line.startsWith("p1: ")) {
+/*  52 */               line = line.split("p1: ")[1];
+/*  53 */               String[] points = line.split(", ");
+/*  54 */               if (points.length == 3)
 /*     */                 try {
-/*  40 */                   gate.p1[0] = Integer.parseInt(points[0]);
-/*  41 */                   gate.p1[1] = Integer.parseInt(points[1]);
-/*  42 */                   gate.p1[2] = Integer.parseInt(points[2]);
-/*  43 */                   p1 = true;
+/*  56 */                   gate.p1[0] = Integer.parseInt(points[0]);
+/*  57 */                   gate.p1[1] = Integer.parseInt(points[1]);
+/*  58 */                   gate.p1[2] = Integer.parseInt(points[2]);
+/*  59 */                   p1 = true;
 /*     */                 } catch (Exception e) {
-/*  45 */                   ignore.add(Integer.valueOf(count));
+/*  61 */                   ignore.add(Integer.valueOf(count));
 /*     */                 }
 /*     */               else
-/*  48 */                 ignore.add(Integer.valueOf(count));
+/*  64 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/*  50 */             else if (line.startsWith("p2: ")) {
-/*  51 */               line = line.split("p2: ")[1];
-/*  52 */               String[] points = line.split(", ");
-/*  53 */               if (points.length == 3)
+/*  66 */             else if (line.startsWith("p2: ")) {
+/*  67 */               line = line.split("p2: ")[1];
+/*  68 */               String[] points = line.split(", ");
+/*  69 */               if (points.length == 3)
 /*     */                 try {
-/*  55 */                   gate.p2[0] = Integer.parseInt(points[0]);
-/*  56 */                   gate.p2[1] = Integer.parseInt(points[1]);
-/*  57 */                   gate.p2[2] = Integer.parseInt(points[2]);
-/*  58 */                   p1 = true;
+/*  71 */                   gate.p2[0] = Integer.parseInt(points[0]);
+/*  72 */                   gate.p2[1] = Integer.parseInt(points[1]);
+/*  73 */                   gate.p2[2] = Integer.parseInt(points[2]);
+/*  74 */                   p1 = true;
 /*     */                 } catch (Exception e) {
-/*  60 */                   ignore.add(Integer.valueOf(count));
+/*  76 */                   ignore.add(Integer.valueOf(count));
 /*     */                 }
 /*     */               else
-/*  63 */                 ignore.add(Integer.valueOf(count));
+/*  79 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/*  65 */             else if (line.startsWith("World: ")) {
+/*  81 */             else if (line.startsWith("World: ")) {
 /*     */               try {
-/*  67 */                 plugin.getServer().getWorld(line.split("World: ")[1]);
-/*  68 */                 gate.World = line.split("World: ")[1];
-/*  69 */                 World = true;
+/*  83 */                 plugin.getServer().getWorld(line.split("World: ")[1]);
+/*  84 */                 gate.World = line.split("World: ")[1];
+/*  85 */                 World = true;
 /*     */               } catch (Exception e) {
-/*  71 */                 ignore.add(Integer.valueOf(count));
+/*  87 */                 ignore.add(Integer.valueOf(count));
 /*     */               }
-/*  73 */             } else if (line.startsWith("Open: ")) {
-/*  74 */               line = line.split("Open: ")[1];
-/*  75 */               if (line.equalsIgnoreCase("true"))
-/*  76 */                 gate.open = true;
-/*  77 */               else if (line.equalsIgnoreCase("false"))
-/*  78 */                 gate.open = false;
+/*  89 */             } else if (line.startsWith("Open: ")) {
+/*  90 */               line = line.split("Open: ")[1];
+/*  91 */               if (line.equalsIgnoreCase("true"))
+/*  92 */                 gate.open = true;
+/*  93 */               else if (line.equalsIgnoreCase("false"))
+/*  94 */                 gate.open = false;
 /*     */               else
-/*  80 */                 ignore.add(Integer.valueOf(count));
+/*  96 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/*  82 */             else if (line.startsWith("timeGate: ")) {
-/*  83 */               line = line.split("timeGate: ")[1];
-/*  84 */               if (line.equalsIgnoreCase("true"))
-/*  85 */                 gate.timeGate = true;
-/*  86 */               else if (line.equalsIgnoreCase("false"))
-/*  87 */                 gate.timeGate = false;
+/*  98 */             else if (line.startsWith("timeGate: ")) {
+/*  99 */               line = line.split("timeGate: ")[1];
+/* 100 */               if (line.equalsIgnoreCase("true"))
+/* 101 */                 gate.timeGate = true;
+/* 102 */               else if (line.equalsIgnoreCase("false"))
+/* 103 */                 gate.timeGate = false;
 /*     */               else
-/*  89 */                 ignore.add(Integer.valueOf(count));
+/* 105 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/*  91 */             else if (line.startsWith("redstoneListener: ")) {
-/*  92 */               line = line.split("redstoneListener: ")[1];
-/*  93 */               if (line.equalsIgnoreCase("true"))
-/*  94 */                 gate.redstoneListener = true;
-/*  95 */               else if (line.equalsIgnoreCase("false"))
-/*  96 */                 gate.redstoneListener = false;
+/* 107 */             else if (line.startsWith("redstoneListener: ")) {
+/* 108 */               line = line.split("redstoneListener: ")[1];
+/* 109 */               if (line.equalsIgnoreCase("true"))
+/* 110 */                 gate.redstoneListener = true;
+/* 111 */               else if (line.equalsIgnoreCase("false"))
+/* 112 */                 gate.redstoneListener = false;
 /*     */               else
-/*  98 */                 ignore.add(Integer.valueOf(count));
+/* 114 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 100 */             else if (line.startsWith("mobKill: ")) {
-/* 101 */               line = line.split("mobKill: ")[1];
-/* 102 */               if (line.equalsIgnoreCase("true"))
-/* 103 */                 gate.mobKill = true;
-/* 104 */               else if (line.equalsIgnoreCase("false"))
-/* 105 */                 gate.mobKill = false;
+/* 116 */             else if (line.startsWith("mobKill: ")) {
+/* 117 */               line = line.split("mobKill: ")[1];
+/* 118 */               if (line.equalsIgnoreCase("true"))
+/* 119 */                 gate.mobKill = true;
+/* 120 */               else if (line.equalsIgnoreCase("false"))
+/* 121 */                 gate.mobKill = false;
 /*     */               else
-/* 107 */                 ignore.add(Integer.valueOf(count));
+/* 123 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 109 */             else if (line.startsWith("Button Listener: ")) {
-/* 110 */               line = line.split("Button Listener: ")[1];
-/* 111 */               if (line.equalsIgnoreCase("true"))
-/* 112 */                 gate.buttonListener = true;
-/* 113 */               else if (line.equalsIgnoreCase("false"))
-/* 114 */                 gate.buttonListener = false;
-/*     */               else
-/* 116 */                 ignore.add(Integer.valueOf(count));
-/*     */             }
-/* 118 */             else if (line.startsWith("Mob: ")) {
-/* 119 */               gate.mob = line.split("Mob: ")[1];
-/* 120 */             } else if (line.startsWith("pr: ")) {
-/* 121 */               line = line.split("pr: ")[1];
-/* 122 */               String[] points = line.split(", ");
-/* 123 */               if (points.length == 3)
-/*     */                 try {
-/* 125 */                   gate.pr[0] = Integer.parseInt(points[0]);
-/* 126 */                   gate.pr[1] = Integer.parseInt(points[1]);
-/* 127 */                   gate.pr[2] = Integer.parseInt(points[2]);
-/*     */                 } catch (Exception e) {
-/* 129 */                   ignore.add(Integer.valueOf(count));
-/*     */                 }
+/* 125 */             else if (line.startsWith("Button Listener: ")) {
+/* 126 */               line = line.split("Button Listener: ")[1];
+/* 127 */               if (line.equalsIgnoreCase("true"))
+/* 128 */                 gate.buttonListener = true;
+/* 129 */               else if (line.equalsIgnoreCase("false"))
+/* 130 */                 gate.buttonListener = false;
 /*     */               else
 /* 132 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 134 */             else if (line.startsWith("Kill Message: ")) {
-/* 135 */               gate.killMsg = line.split("Kill Message: ")[1];
-/* 136 */             } else if (line.startsWith("Button: ")) {
-/* 137 */               line = line.split("Button: ")[1];
+/* 134 */             else if (line.startsWith("Mob: ")) {
+/* 135 */               gate.mob = line.split("Mob: ")[1];
+/* 136 */             } else if (line.startsWith("pr: ")) {
+/* 137 */               line = line.split("pr: ")[1];
 /* 138 */               String[] points = line.split(", ");
 /* 139 */               if (points.length == 3)
 /*     */                 try {
-/* 141 */                   gate.button[0] = Integer.parseInt(points[0]);
-/* 142 */                   gate.button[1] = Integer.parseInt(points[1]);
-/* 143 */                   gate.button[2] = Integer.parseInt(points[2]);
+/* 141 */                   gate.pr[0] = Integer.parseInt(points[0]);
+/* 142 */                   gate.pr[1] = Integer.parseInt(points[1]);
+/* 143 */                   gate.pr[2] = Integer.parseInt(points[2]);
 /*     */                 } catch (Exception e) {
+/* 145 */                   ignore.add(Integer.valueOf(count));
 /*     */                 }
-/* 146 */             } else if (line.startsWith("ButtonInterval: ")) {
+/*     */               else
+/* 148 */                 ignore.add(Integer.valueOf(count));
+/*     */             }
+/* 150 */             else if (line.startsWith("Kill Message: ")) {
+/* 151 */               gate.killMsg = line.split("Kill Message: ")[1];
+/* 152 */             } else if (line.startsWith("Button: ")) {
+/* 153 */               line = line.split("Button: ")[1];
+/* 154 */               String[] points = line.split(", ");
+/* 155 */               if (points.length == 3)
+/*     */                 try {
+/* 157 */                   gate.button[0] = Integer.parseInt(points[0]);
+/* 158 */                   gate.button[1] = Integer.parseInt(points[1]);
+/* 159 */                   gate.button[2] = Integer.parseInt(points[2]);
+/*     */                 } catch (Exception localException1) {
+/*     */                 }
+/* 162 */             } else if (line.startsWith("ButtonInterval: ")) {
 /*     */               try {
-/* 148 */                 gate.ButtonInterval = Integer.parseInt(line.split("ButtonInterval: ")[1]);
+/* 164 */                 gate.ButtonInterval = Integer.parseInt(line.split("ButtonInterval: ")[1]);
 /*     */               } catch (Exception e) {
-/* 150 */                 ignore.add(Integer.valueOf(count));
-/*     */               }
-/* 152 */             } else if (line.startsWith("Button Permission: ")) {
-/* 153 */               if (line.split("Button Permission: ")[1].equalsIgnoreCase("true"))
-/* 154 */                 gate.buttonPerm = true;
-/* 155 */               else if (line.split("Button Permission: ")[1].equalsIgnoreCase("false"))
-/* 156 */                 gate.buttonPerm = false;
-/*     */               else
-/* 158 */                 ignore.add(Integer.valueOf(count));
-/*     */             }
-/* 160 */             else if (line.startsWith("Kill Permission: ")) {
-/* 161 */               if (line.split("Kill Permission: ")[1].equalsIgnoreCase("true"))
-/* 162 */                 gate.killPerm = true;
-/* 163 */               else if (line.split("Kill Permission: ")[1].equalsIgnoreCase("false"))
-/* 164 */                 gate.killPerm = false;
-/*     */               else
 /* 166 */                 ignore.add(Integer.valueOf(count));
-/*     */             }
-/* 168 */             else if (line.startsWith("Open Permission: ")) {
-/* 169 */               if (line.split("Open Permission: ")[1].equalsIgnoreCase("true"))
-/* 170 */                 gate.openPerm = true;
-/* 171 */               else if (line.split("Open Permission: ")[1].equalsIgnoreCase("false"))
-/* 172 */                 gate.openPerm = false;
+/*     */               }
+/* 168 */             } else if (line.startsWith("Button Permission: ")) {
+/* 169 */               if (line.split("Button Permission: ")[1].equalsIgnoreCase("true"))
+/* 170 */                 gate.buttonPerm = true;
+/* 171 */               else if (line.split("Button Permission: ")[1].equalsIgnoreCase("false"))
+/* 172 */                 gate.buttonPerm = false;
 /*     */               else
 /* 174 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 176 */             else if (line.startsWith("Close Permission: ")) {
-/* 177 */               if (line.split("Close Permission: ")[1].equalsIgnoreCase("true"))
-/* 178 */                 gate.closePerm = true;
-/* 179 */               else if (line.split("Close Permission: ")[1].equalsIgnoreCase("false"))
-/* 180 */                 gate.closePerm = false;
+/* 176 */             else if (line.startsWith("Kill Permission: ")) {
+/* 177 */               if (line.split("Kill Permission: ")[1].equalsIgnoreCase("true"))
+/* 178 */                 gate.killPerm = true;
+/* 179 */               else if (line.split("Kill Permission: ")[1].equalsIgnoreCase("false"))
+/* 180 */                 gate.killPerm = false;
 /*     */               else
 /* 182 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 184 */             else if (line.startsWith("Material1: ")) {
-/* 185 */               if (line.contains(", ")) {
-/* 186 */                 ArrayList m1 = new ArrayList();
-/* 187 */                 String[] materials = line.substring("Material1: ".length()).split(", ");
-/* 188 */                 for (int a = 0; a < materials.length; a++) {
-/* 189 */                   String[] material = materials[a].split(":");
-/* 190 */                   m1.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
+/* 184 */             else if (line.startsWith("Open Permission: ")) {
+/* 185 */               if (line.split("Open Permission: ")[1].equalsIgnoreCase("true"))
+/* 186 */                 gate.openPerm = true;
+/* 187 */               else if (line.split("Open Permission: ")[1].equalsIgnoreCase("false"))
+/* 188 */                 gate.openPerm = false;
+/*     */               else
+/* 190 */                 ignore.add(Integer.valueOf(count));
+/*     */             }
+/* 192 */             else if (line.startsWith("Close Permission: ")) {
+/* 193 */               if (line.split("Close Permission: ")[1].equalsIgnoreCase("true"))
+/* 194 */                 gate.closePerm = true;
+/* 195 */               else if (line.split("Close Permission: ")[1].equalsIgnoreCase("false"))
+/* 196 */                 gate.closePerm = false;
+/*     */               else
+/* 198 */                 ignore.add(Integer.valueOf(count));
+/*     */             }
+/* 200 */             else if (line.startsWith("Material1: ")) {
+/* 201 */               if (line.contains(", ")) {
+/* 202 */                 ArrayList m1 = new ArrayList();
+/* 203 */                 String[] materials = line.substring("Material1: ".length()).split(", ");
+/* 204 */                 for (int a = 0; a < materials.length; a++) {
+/* 205 */                   String[] material = materials[a].split(":");
+/* 206 */                   m1.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
 /*     */                 }
-/* 192 */                 gate.materials1 = m1;
+/* 208 */                 gate.materials1 = m1;
 /*     */               } else {
-/* 194 */                 ArrayList m1 = new ArrayList();
-/* 195 */                 String[] material = line.substring("Material1: ".length()).split(":");
-/* 196 */                 m1.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
-/* 197 */                 gate.materials1 = m1;
+/* 210 */                 ArrayList m1 = new ArrayList();
+/* 211 */                 String[] material = line.substring("Material1: ".length()).split(":");
+/* 212 */                 m1.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
+/* 213 */                 gate.materials1 = m1;
 /*     */               }
-/* 199 */             } else if (line.startsWith("Material2: ")) {
-/* 200 */               if (line.contains(", ")) {
-/* 201 */                 ArrayList m2 = new ArrayList();
-/* 202 */                 String[] materials = line.substring("Material2: ".length()).split(", ");
-/* 203 */                 for (int a = 0; a < materials.length; a++) {
-/* 204 */                   String[] material = materials[a].split(":");
-/* 205 */                   m2.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
+/* 215 */             } else if (line.startsWith("Material2: ")) {
+/* 216 */               if (line.contains(", ")) {
+/* 217 */                 ArrayList m2 = new ArrayList();
+/* 218 */                 String[] materials = line.substring("Material2: ".length()).split(", ");
+/* 219 */                 for (int a = 0; a < materials.length; a++) {
+/* 220 */                   String[] material = materials[a].split(":");
+/* 221 */                   m2.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
 /*     */                 }
-/* 207 */                 gate.materials2 = m2;
+/* 223 */                 gate.materials2 = m2;
 /*     */               } else {
-/* 209 */                 ArrayList m2 = new ArrayList();
-/* 210 */                 String[] material = line.substring("Material2: ".length()).split(":");
-/* 211 */                 m2.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
-/* 212 */                 gate.materials2 = m2;
+/* 225 */                 ArrayList m2 = new ArrayList();
+/* 226 */                 String[] material = line.substring("Material2: ".length()).split(":");
+/* 227 */                 m2.add(new MaterialId(Integer.parseInt(material[0]), Byte.parseByte(material[1])));
+/* 228 */                 gate.materials2 = m2;
 /*     */               }
-/* 214 */             } else if ((!line.equals("")) && (!line.startsWith("#")) && (!line.equals("Redstone: ")) && (!line.equals("KillListener: ")) && (!line.equals("ButtonListener: ")) && (!line.equals("Permissions: ")))
+/* 230 */             } else if ((!line.equals("")) && (!line.startsWith("#")) && (!line.equals("Redstone: ")) && (!line.equals("KillListener: ")) && (!line.equals("ButtonListener: ")) && (!line.equals("Permissions: ")))
 /*     */             {
-/* 216 */               ignore.add(Integer.valueOf(count));
+/* 232 */               ignore.add(Integer.valueOf(count));
 /*     */             }
 /*     */           } catch (Exception e) {
-/* 219 */             ignore.add(Integer.valueOf(count));
+/* 235 */             ignore.add(Integer.valueOf(count));
 /*     */           }
 /*     */         }
-/* 222 */         gd.add(gate);
+/* 238 */         gd.add(gate);
 /*     */       }
 /*     */     }
-/* 225 */     if (!ignore.isEmpty()) {
-/* 226 */       String i = "";
-/* 227 */       for (int a = 0; a < ignore.size(); a++) {
-/* 228 */         if (a == 0)
-/* 229 */           i = String.valueOf(ignore.get(a));
+/* 241 */     if (!ignore.isEmpty()) {
+/* 242 */       String i = "";
+/* 243 */       for (int a = 0; a < ignore.size(); a++) {
+/* 244 */         if (a == 0)
+/* 245 */           i = String.valueOf(ignore.get(a));
 /*     */         else {
-/* 231 */           i = i + ", " + String.valueOf(ignore.get(a));
+/* 247 */           i = i + ", " + String.valueOf(ignore.get(a));
 /*     */         }
 /*     */       }
-/* 234 */       plugin.getLogger().warning("Loading Gates: Ignore Lines: " + i);
+/* 250 */       plugin.getLogger().warning("Loading Gates: Ignore Lines: " + i);
 /*     */     }
-/* 236 */     bf.close();
-/* 237 */     return gd;
+/* 252 */     bf.close();
+/* 253 */     return gd;
 /*     */   }
 /*     */ 
 /*     */   public static ArrayList<GateGroup> LoadGroups(ArrayList<Gate> gd, Plugin p) throws Exception {
-/* 241 */     ArrayList gg = new ArrayList();
-/* 242 */     ArrayList ignore = new ArrayList();
-/* 243 */     FileInputStream fis = new FileInputStream("plugins/CityGates/groups.yml");
-/* 244 */     int lines = fis.available();
-/* 245 */     fis.close();
-/* 246 */     if (lines == 0) {
-/* 247 */       throw new IOException("File is empty");
+/* 257 */     ArrayList gg = new ArrayList();
+/* 258 */     ArrayList ignore = new ArrayList();
+/* 259 */     FileInputStream fis = new FileInputStream("plugins/CityGates/groups.yml");
+/* 260 */     int lines = fis.available();
+/* 261 */     fis.close();
+/* 262 */     if (lines == 0) {
+/* 263 */       throw new IOException("File is empty");
 /*     */     }
-/* 249 */     BufferedReader bf = new BufferedReader(new FileReader("plugins/CityGates/groups.yml"));
+/* 265 */     BufferedReader bf = new BufferedReader(new FileReader("plugins/CityGates/groups.yml"));
 /*     */ 
-/* 251 */     int count = 0;
+/* 267 */     int count = 0;
 /*     */     String line;
-/* 252 */     while ((line = bf.readLine()) != null) {
-/* 253 */       count++;
-/* 254 */       if (line.startsWith("Add Group: ")) {
-/* 255 */         GateGroup group = new GateGroup(line.split("Add Group: ")[1], p);
-/* 256 */         while (!(line = bf.readLine()).equals("End Group")) {
-/* 257 */           count++;
+/* 269 */     while ((line = bf.readLine()) != null)
+/*     */     {
+/*     */       String line;
+/* 270 */       count++;
+/* 271 */       if (line.startsWith("Add Group: ")) {
+/* 272 */         GateGroup group = new GateGroup(line.split("Add Group: ")[1], p);
+/* 273 */         while (!(line = bf.readLine()).equals("End Group")) {
+/* 274 */           count++;
 /*     */           try {
-/* 259 */             while (line.startsWith(" ")) {
-/* 260 */               line = line.substring(1);
+/* 276 */             while (line.startsWith(" ")) {
+/* 277 */               line = line.substring(1);
 /*     */             }
-/* 262 */             if (line.startsWith("Delay: ")) {
+/* 279 */             if (line.startsWith("Delay: ")) {
 /*     */               try {
-/* 264 */                 group.setDelay(Integer.parseInt(line.split("Delay: ")[1]));
+/* 281 */                 group.setDelay(Integer.parseInt(line.split("Delay: ")[1]));
 /*     */               } catch (Exception e) {
-/* 266 */                 ignore.add(Integer.valueOf(count));
+/* 283 */                 ignore.add(Integer.valueOf(count));
 /*     */               }
-/* 268 */             } else if (line.startsWith("World: ")) {
+/* 285 */             } else if (line.startsWith("World: ")) {
 /*     */               try {
-/* 270 */                 p.getServer().getWorld(line.split("World: ")[1]);
-/* 271 */                 group.world = line.split("World: ")[1];
+/* 287 */                 p.getServer().getWorld(line.split("World: ")[1]);
+/* 288 */                 group.world = line.split("World: ")[1];
 /*     */               } catch (Exception e) {
-/* 273 */                 ignore.add(Integer.valueOf(count));
+/* 290 */                 ignore.add(Integer.valueOf(count));
 /*     */               }
-/* 275 */             } else if (line.startsWith("Open: ")) {
-/* 276 */               line = line.split("Open: ")[1];
-/* 277 */               if (line.equalsIgnoreCase("true"))
-/* 278 */                 group.open = true;
-/* 279 */               else if (line.equalsIgnoreCase("false"))
-/* 280 */                 group.open = false;
+/* 292 */             } else if (line.startsWith("Open: ")) {
+/* 293 */               line = line.split("Open: ")[1];
+/* 294 */               if (line.equalsIgnoreCase("true"))
+/* 295 */                 group.open = true;
+/* 296 */               else if (line.equalsIgnoreCase("false"))
+/* 297 */                 group.open = false;
 /*     */               else
-/* 282 */                 ignore.add(Integer.valueOf(count));
+/* 299 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 284 */             else if (line.startsWith("timeGate: ")) {
-/* 285 */               line = line.split("timeGate: ")[1];
-/* 286 */               if (line.equalsIgnoreCase("true"))
-/* 287 */                 group.timegate = true;
-/* 288 */               else if (line.equalsIgnoreCase("false"))
-/* 289 */                 group.timegate = false;
+/* 301 */             else if (line.startsWith("timeGate: ")) {
+/* 302 */               line = line.split("timeGate: ")[1];
+/* 303 */               if (line.equalsIgnoreCase("true"))
+/* 304 */                 group.timegate = true;
+/* 305 */               else if (line.equalsIgnoreCase("false"))
+/* 306 */                 group.timegate = false;
 /*     */               else
-/* 291 */                 ignore.add(Integer.valueOf(count));
+/* 308 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 293 */             else if (line.startsWith("redstoneListener: ")) {
-/* 294 */               line = line.split("redstoneListener: ")[1];
-/* 295 */               if (line.equalsIgnoreCase("true"))
-/* 296 */                 group.redstoneListener = true;
-/* 297 */               else if (line.equalsIgnoreCase("false"))
-/* 298 */                 group.redstoneListener = false;
+/* 310 */             else if (line.startsWith("redstoneListener: ")) {
+/* 311 */               line = line.split("redstoneListener: ")[1];
+/* 312 */               if (line.equalsIgnoreCase("true"))
+/* 313 */                 group.redstoneListener = true;
+/* 314 */               else if (line.equalsIgnoreCase("false"))
+/* 315 */                 group.redstoneListener = false;
 /*     */               else
-/* 300 */                 ignore.add(Integer.valueOf(count));
+/* 317 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 302 */             else if (line.startsWith("mobKill: ")) {
-/* 303 */               line = line.split("mobKill: ")[1];
-/* 304 */               if (line.equalsIgnoreCase("true"))
-/* 305 */                 group.mobKill = true;
-/* 306 */               else if (line.equalsIgnoreCase("false"))
-/* 307 */                 group.mobKill = false;
+/* 319 */             else if (line.startsWith("mobKill: ")) {
+/* 320 */               line = line.split("mobKill: ")[1];
+/* 321 */               if (line.equalsIgnoreCase("true"))
+/* 322 */                 group.mobKill = true;
+/* 323 */               else if (line.equalsIgnoreCase("false"))
+/* 324 */                 group.mobKill = false;
 /*     */               else
-/* 309 */                 ignore.add(Integer.valueOf(count));
+/* 326 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 311 */             else if (line.startsWith("Button Listener: ")) {
-/* 312 */               line = line.split("Button Listener: ")[1];
-/* 313 */               if (line.equalsIgnoreCase("true"))
-/* 314 */                 group.buttonListener = true;
-/* 315 */               else if (line.equalsIgnoreCase("false"))
-/* 316 */                 group.buttonListener = false;
+/* 328 */             else if (line.startsWith("Button Listener: ")) {
+/* 329 */               line = line.split("Button Listener: ")[1];
+/* 330 */               if (line.equalsIgnoreCase("true"))
+/* 331 */                 group.buttonListener = true;
+/* 332 */               else if (line.equalsIgnoreCase("false"))
+/* 333 */                 group.buttonListener = false;
 /*     */               else
-/* 318 */                 ignore.add(Integer.valueOf(count));
+/* 335 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 320 */             else if (line.startsWith("Mob: ")) {
-/* 321 */               group.mob = line.split("Mob: ")[1];
-/* 322 */             } else if (line.startsWith("pr: ")) {
-/* 323 */               line = line.split("pr: ")[1];
-/* 324 */               String[] points = line.split(", ");
-/* 325 */               if (points.length == 3)
+/* 337 */             else if (line.startsWith("Mob: ")) {
+/* 338 */               group.mob = line.split("Mob: ")[1];
+/* 339 */             } else if (line.startsWith("pr: ")) {
+/* 340 */               line = line.split("pr: ")[1];
+/* 341 */               String[] points = line.split(", ");
+/* 342 */               if (points.length == 3)
 /*     */                 try {
-/* 327 */                   group.pr[0] = Integer.parseInt(points[0]);
-/* 328 */                   group.pr[1] = Integer.parseInt(points[1]);
-/* 329 */                   group.pr[2] = Integer.parseInt(points[2]);
+/* 344 */                   group.pr[0] = Integer.parseInt(points[0]);
+/* 345 */                   group.pr[1] = Integer.parseInt(points[1]);
+/* 346 */                   group.pr[2] = Integer.parseInt(points[2]);
 /*     */                 } catch (Exception e) {
-/* 331 */                   ignore.add(Integer.valueOf(count));
+/* 348 */                   ignore.add(Integer.valueOf(count));
 /*     */                 }
 /*     */               else
-/* 334 */                 ignore.add(Integer.valueOf(count));
+/* 351 */                 ignore.add(Integer.valueOf(count));
 /*     */             }
-/* 336 */             else if (line.startsWith("Kill Message: ")) {
-/* 337 */               group.killMsg = line.split("Kill Message: ")[1];
-/* 338 */             } else if (line.startsWith("Button: ")) {
-/* 339 */               line = line.split("Button: ")[1];
-/* 340 */               String[] points = line.split(", ");
-/* 341 */               if (points.length == 3)
+/* 353 */             else if (line.startsWith("Kill Message: ")) {
+/* 354 */               group.killMsg = line.split("Kill Message: ")[1];
+/* 355 */             } else if (line.startsWith("Button: ")) {
+/* 356 */               line = line.split("Button: ")[1];
+/* 357 */               String[] points = line.split(", ");
+/* 358 */               if (points.length == 3)
 /*     */                 try {
-/* 343 */                   group.button[0] = Integer.parseInt(points[0]);
-/* 344 */                   group.button[1] = Integer.parseInt(points[1]);
-/* 345 */                   group.button[2] = Integer.parseInt(points[2]);
+/* 360 */                   group.button[0] = Integer.parseInt(points[0]);
+/* 361 */                   group.button[1] = Integer.parseInt(points[1]);
+/* 362 */                   group.button[2] = Integer.parseInt(points[2]);
 /*     */                 } catch (Exception e) {
-/* 347 */                   ignore.add(Integer.valueOf(count));
+/* 364 */                   ignore.add(Integer.valueOf(count));
 /*     */                 }
 /*     */               else
-/* 350 */                 ignore.add(Integer.valueOf(count));
+/* 367 */                 ignore.add(Integer.valueOf(count));
 /*     */             } else {
-/* 352 */               if (line.startsWith("Children: ")) {
-/* 353 */                 while (!(line = bf.readLine()).equals("  End Children")) {
-/* 354 */                   count++;
-/* 355 */                   while (line.startsWith(" "))
-/* 356 */                     line = line.substring(1);
+/* 369 */               if (line.startsWith("Children: ")) {
+/* 370 */                 for (; !(line = bf.readLine()).equals(" End Children"); 
+/* 372 */                   line.startsWith(" "))
+/*     */                 {
+/* 371 */                   count++;
+/* 372 */                   continue;
+/* 373 */                   line = line.substring(1);
 /*     */                 }
 /*     */               }
-/* 359 */               if (line.startsWith("ButtonInterval: "))
+/* 376 */               if (line.startsWith("ButtonInterval: "))
 /*     */                 try {
-/* 361 */                   group.ButtonInterval = Integer.parseInt(line.split("ButtonInterval: ")[1]);
+/* 378 */                   group.ButtonInterval = Integer.parseInt(line.split("ButtonInterval: ")[1]);
 /*     */                 } catch (Exception e) {
-/* 363 */                   ignore.add(Integer.valueOf(count));
+/* 380 */                   ignore.add(Integer.valueOf(count));
 /*     */                 }
-/* 365 */               else if (line.startsWith("Button Permission: ")) {
-/* 366 */                 if (line.split("Button Permission: ")[1].equalsIgnoreCase("true"))
-/* 367 */                   group.buttonPerm = true;
-/* 368 */                 else if (line.split("Button Permission: ")[1].equalsIgnoreCase("false"))
-/* 369 */                   group.buttonPerm = false;
+/* 382 */               else if (line.startsWith("Button Permission: ")) {
+/* 383 */                 if (line.split("Button Permission: ")[1].equalsIgnoreCase("true"))
+/* 384 */                   group.buttonPerm = true;
+/* 385 */                 else if (line.split("Button Permission: ")[1].equalsIgnoreCase("false"))
+/* 386 */                   group.buttonPerm = false;
 /*     */                 else
-/* 371 */                   ignore.add(Integer.valueOf(count));
+/* 388 */                   ignore.add(Integer.valueOf(count));
 /*     */               }
-/* 373 */               else if (line.startsWith("Kill Permission: ")) {
-/* 374 */                 if (line.split("Kill Permission: ")[1].equalsIgnoreCase("true"))
-/* 375 */                   group.killPerm = true;
-/* 376 */                 else if (line.split("Kill Permission: ")[1].equalsIgnoreCase("false"))
-/* 377 */                   group.killPerm = false;
+/* 390 */               else if (line.startsWith("Kill Permission: ")) {
+/* 391 */                 if (line.split("Kill Permission: ")[1].equalsIgnoreCase("true"))
+/* 392 */                   group.killPerm = true;
+/* 393 */                 else if (line.split("Kill Permission: ")[1].equalsIgnoreCase("false"))
+/* 394 */                   group.killPerm = false;
 /*     */                 else
-/* 379 */                   ignore.add(Integer.valueOf(count));
+/* 396 */                   ignore.add(Integer.valueOf(count));
 /*     */               }
-/* 381 */               else if (line.startsWith("Open Permission: ")) {
-/* 382 */                 if (line.split("Open Permission: ")[1].equalsIgnoreCase("true"))
-/* 383 */                   group.openPerm = true;
-/* 384 */                 else if (line.split("Open Permission: ")[1].equalsIgnoreCase("false"))
-/* 385 */                   group.openPerm = false;
+/* 398 */               else if (line.startsWith("Open Permission: ")) {
+/* 399 */                 if (line.split("Open Permission: ")[1].equalsIgnoreCase("true"))
+/* 400 */                   group.openPerm = true;
+/* 401 */                 else if (line.split("Open Permission: ")[1].equalsIgnoreCase("false"))
+/* 402 */                   group.openPerm = false;
 /*     */                 else
-/* 387 */                   ignore.add(Integer.valueOf(count));
+/* 404 */                   ignore.add(Integer.valueOf(count));
 /*     */               }
-/* 389 */               else if (line.startsWith("Close Permission: ")) {
-/* 390 */                 if (line.split("Close Permission: ")[1].equalsIgnoreCase("true"))
-/* 391 */                   group.closePerm = true;
-/* 392 */                 else if (line.split("Close Permission: ")[1].equalsIgnoreCase("false"))
-/* 393 */                   group.closePerm = false;
+/* 406 */               else if (line.startsWith("Close Permission: ")) {
+/* 407 */                 if (line.split("Close Permission: ")[1].equalsIgnoreCase("true"))
+/* 408 */                   group.closePerm = true;
+/* 409 */                 else if (line.split("Close Permission: ")[1].equalsIgnoreCase("false"))
+/* 410 */                   group.closePerm = false;
 /*     */                 else
-/* 395 */                   ignore.add(Integer.valueOf(count));
+/* 412 */                   ignore.add(Integer.valueOf(count));
 /*     */               }
-/* 397 */               else if ((!line.equals("")) && (!line.startsWith("#")) && (!line.equals("Redstone: ")) && (!line.equals("KillListener: ")) && (!line.equals("ButtonListener: ")) && (!line.equals("Permissions: ")))
+/* 414 */               else if ((!line.equals("")) && (!line.startsWith("#")) && (!line.equals("Redstone: ")) && (!line.equals("KillListener: ")) && (!line.equals("ButtonListener: ")) && (!line.equals("Permissions: ")))
 /*     */               {
-/* 399 */                 ignore.add(Integer.valueOf(count));
+/* 416 */                 ignore.add(Integer.valueOf(count));
 /*     */               }
 /*     */             }
-/*     */           } catch (Exception e) { ignore.add(Integer.valueOf(count)); }
-/*     */ 
+/*     */           } catch (Exception e) {
+/* 420 */             ignore.add(Integer.valueOf(count));
+/*     */           }
 /*     */         }
-/* 405 */         gg.add(group);
+/* 423 */         gg.add(group);
 /*     */       }
 /*     */     }
-/* 408 */     bf.close();
+/* 426 */     bf.close();
 /*     */ 
-/* 410 */     int index = 0;
-/* 411 */     bf = new BufferedReader(new FileReader("plugins/CityGates/groups.yml"));
-/* 412 */     count = 0;
-/* 413 */     while ((line = bf.readLine()) != null) {
-/* 414 */       count++;
-/* 415 */       if (line.startsWith("Add Group: ")) {
-/* 416 */         GateGroup group = (GateGroup)gg.get(index);
-/* 417 */         index++;
-/* 418 */         while (!(line = bf.readLine()).equals("End Group")) {
-/* 419 */           count++;
+/* 428 */     int index = 0;
+/* 429 */     bf = new BufferedReader(new FileReader("plugins/CityGates/groups.yml"));
+/* 430 */     count = 0;
+/* 431 */     while ((line = bf.readLine()) != null) {
+/* 432 */       count++;
+/* 433 */       if (line.startsWith("Add Group: ")) {
+/* 434 */         GateGroup group = (GateGroup)gg.get(index);
+/* 435 */         index++;
+/* 436 */         while (!(line = bf.readLine()).equals("End Group")) {
+/* 437 */           count++;
 /*     */           try {
-/* 421 */             while (line.startsWith(" ")) {
-/* 422 */               line = line.substring(1);
+/* 439 */             while (line.startsWith(" ")) {
+/* 440 */               line = line.substring(1);
 /*     */             }
-/* 424 */             if (line.startsWith("Children: "))
-/* 425 */               while (!(line = bf.readLine()).equals("  End Children")) {
-/* 426 */                 while (line.startsWith(" ")) {
-/* 427 */                   line = line.substring(1);
+/* 442 */             if (line.startsWith("Children: "))
+/* 443 */               while (!(line = bf.readLine()).equals(" End Children")) {
+/* 444 */                 while (line.startsWith(" ")) {
+/* 445 */                   line = line.substring(1);
 /*     */                 }
-/* 429 */                 boolean done = false;
-/* 430 */                 for (int a = 0; a < gd.size(); a++) {
-/* 431 */                   if (((Gate)gd.get(a)).gd.name.equals(line)) {
-/* 432 */                     group.add((Gate)gd.get(a));
-/* 433 */                     done = true;
+/* 447 */                 boolean done = false;
+/* 448 */                 for (int a = 0; a < gd.size(); a++) {
+/* 449 */                   if (((Gate)gd.get(a)).gd.name.equals(line)) {
+/* 450 */                     group.add((Gate)gd.get(a));
+/* 451 */                     done = true;
 /*     */                   }
 /*     */                 }
-/* 436 */                 for (int a = 0; a < gg.size(); a++) {
-/* 437 */                   if ((((GateGroup)gg.get(a)).name.equals(line)) && (!line.equals(group.name))) {
-/* 438 */                     group.add((GateGroup)gg.get(a));
-/* 439 */                     done = true;
+/* 454 */                 for (int a = 0; a < gg.size(); a++) {
+/* 455 */                   if ((((GateGroup)gg.get(a)).name.equals(line)) && (!line.equals(group.name))) {
+/* 456 */                     group.add((GateGroup)gg.get(a));
+/* 457 */                     done = true;
 /*     */                   }
 /*     */                 }
-/* 442 */                 if (!done)
-/* 443 */                   ignore.add(Integer.valueOf(count));
+/* 460 */                 if (!done)
+/* 461 */                   ignore.add(Integer.valueOf(count));
 /*     */               }
 /*     */           }
 /*     */           catch (Exception e)
 /*     */           {
-/* 448 */             ignore.add(Integer.valueOf(count));
+/* 466 */             ignore.add(Integer.valueOf(count));
 /*     */           }
 /*     */         }
 /*     */       }
 /*     */     }
-/* 453 */     bf.close();
-/* 454 */     if (!ignore.isEmpty()) {
-/* 455 */       String i = "";
-/* 456 */       for (int a = 0; a < ignore.size(); a++) {
-/* 457 */         if (a == 0)
-/* 458 */           i = String.valueOf(ignore.get(a));
+/* 471 */     bf.close();
+/* 472 */     if (!ignore.isEmpty()) {
+/* 473 */       String i = "";
+/* 474 */       for (int a = 0; a < ignore.size(); a++) {
+/* 475 */         if (a == 0)
+/* 476 */           i = String.valueOf(ignore.get(a));
 /*     */         else {
-/* 460 */           i = i + ", " + String.valueOf(ignore.get(a));
+/* 478 */           i = i + ", " + String.valueOf(ignore.get(a));
 /*     */         }
 /*     */       }
-/* 463 */       p.getLogger().warning("Loading Groups: Ignore Lines: " + i);
+/* 481 */       p.getLogger().warning("Loading Groups: Ignore Lines: " + i);
 /*     */     }
-/* 465 */     return gg;
+/* 483 */     return gg;
+/*     */   }
+/*     */ 
+/*     */   public static General LoadGeneral(Plugin plugin) throws Exception {
+/* 487 */     General g = new General();
+/* 488 */     FileInputStream fis = new FileInputStream("plugins/CityGates/general.yml");
+/* 489 */     int lines = fis.available();
+/* 490 */     fis.close();
+/* 491 */     if (lines == 0) {
+/* 492 */       throw new IOException("File is empty");
+/*     */     }
+/* 494 */     BufferedReader bf = new BufferedReader(new FileReader("plugins/CityGates/general.yml"));
+/*     */ 
+/* 496 */     ArrayList ignore = new ArrayList();
+/* 497 */     int count = 0;
+/*     */     String line;
+/* 499 */     while ((line = bf.readLine()) != null)
+/*     */     {
+/*     */       String line;
+/* 500 */       count++;
+/*     */       try {
+/* 502 */         if (line.startsWith("UpdateTime: ")) {
+/* 503 */           double hour = Double.parseDouble(line.substring("UpdateTime: ".length()));
+/* 504 */           g.updateTime = (()(hour * 3600000.0D));
+/* 505 */           if (g.updateTime == 0L) {
+/* 506 */             plugin.getLogger().warning("Error parsing updateTime! Cannot be 0, set updateTime to 1 hour");
+/* 507 */             g.updateTime = 3600000L;
+/*     */           }
+/* 509 */         } else if (line.startsWith("Update msg: ")) {
+/* 510 */           if (line.substring("Update msg: ".length()).equalsIgnoreCase("true"))
+/* 511 */             g.updateMsg = true;
+/* 512 */           else if (line.substring("Update msg: ".length()).equalsIgnoreCase("false"))
+/* 513 */             g.updateMsg = false;
+/*     */           else
+/* 515 */             ignore.add(Integer.valueOf(count));
+/*     */         }
+/* 517 */         else if (line.startsWith("Night: ")) {
+/* 518 */           g.night = Integer.parseInt(line.substring("Night: ".length()));
+/* 519 */         } else if (line.startsWith("Day: ")) {
+/* 520 */           g.day = Integer.parseInt(line.substring("Day: ".length()));
+/* 521 */         } else if ((!line.startsWith("#")) && (!line.equals("")))
+/*     */         {
+/* 523 */           ignore.add(Integer.valueOf(count));
+/*     */         }
+/*     */       } catch (Exception e) {
+/* 526 */         ignore.add(Integer.valueOf(count));
+/*     */       }
+/*     */     }
+/* 529 */     if (!ignore.isEmpty()) {
+/* 530 */       String i = "";
+/* 531 */       for (int a = 0; a < ignore.size(); a++) {
+/* 532 */         if (a == 0)
+/* 533 */           i = String.valueOf(ignore.get(a));
+/*     */         else {
+/* 535 */           i = i + ", " + String.valueOf(ignore.get(a));
+/*     */         }
+/*     */       }
+/* 538 */       plugin.getLogger().warning("Loading General: Ignore Lines: " + i);
+/*     */     }
+/* 540 */     bf.close();
+/* 541 */     return g;
 /*     */   }
 /*     */ 
 /*     */   public static void SaveGates(ArrayList<GateData> gd) throws Exception {
-/* 469 */     BufferedWriter bf = new BufferedWriter(new FileWriter("plugins/CityGates/gates.yml"));
-/* 470 */     bf.write("# CityGates - Gates");
-/* 471 */     bf.newLine();
-/* 472 */     bf.newLine();
-/* 473 */     bf.write("# Only edit everything after the ':'");
-/* 474 */     bf.newLine();
-/* 475 */     bf.write("# There are 3 defirent parameters: value, String, boolean");
-/* 476 */     bf.newLine();
-/* 477 */     bf.write("# Do not leave any parameter black!");
-/* 478 */     bf.newLine();
-/* 479 */     bf.newLine();
-/* 480 */     bf.write("# value: Any number without dots!");
-/* 481 */     bf.newLine();
-/* 482 */     bf.write("# String: Text");
-/* 483 */     bf.newLine();
-/* 484 */     bf.write("# Boolean: true/false");
-/* 485 */     bf.newLine();
-/* 486 */     bf.newLine();
+/* 545 */     BufferedWriter bf = new BufferedWriter(new FileWriter("plugins/CityGates/gates.yml"));
+/* 546 */     bf.write("# CityGates - Gates");
+/* 547 */     bf.newLine();
+/* 548 */     bf.newLine();
+/* 549 */     bf.write("# Only edit everything after the ':'");
+/* 550 */     bf.newLine();
+/* 551 */     bf.write("# There are 3 defirent parameters: value, String, boolean");
+/* 552 */     bf.newLine();
+/* 553 */     bf.write("# Do not leave any parameter black!");
+/* 554 */     bf.newLine();
+/* 555 */     bf.newLine();
+/* 556 */     bf.write("# value: Any number without dots!");
+/* 557 */     bf.newLine();
+/* 558 */     bf.write("# String: Text");
+/* 559 */     bf.newLine();
+/* 560 */     bf.write("# Boolean: true/false");
+/* 561 */     bf.newLine();
+/* 562 */     bf.newLine();
 /*     */ 
-/* 488 */     for (int a = 0; a < gd.size(); a++) {
-/* 489 */       GateData g = (GateData)gd.get(a);
-/* 490 */       bf.write("Add Gate: " + g.name);
-/* 491 */       bf.newLine();
-/* 492 */       bf.write("  p1: " + g.p1[0] + ", " + g.p1[1] + ", " + g.p1[2]);
-/* 493 */       bf.newLine();
-/* 494 */       bf.write("  p2: " + g.p2[0] + ", " + g.p2[1] + ", " + g.p2[2]);
-/* 495 */       bf.newLine();
-/* 496 */       bf.write("  World: " + g.World);
-/* 497 */       bf.newLine();
-/* 498 */       bf.write("  Open: " + g.open);
-/* 499 */       bf.newLine();
-/* 500 */       bf.write("  timeGate: " + g.timeGate);
-/* 501 */       bf.newLine();
-/* 502 */       bf.write("  Redstone: ");
-/* 503 */       bf.newLine();
-/* 504 */       bf.write("    redstoneListener: " + g.redstoneListener);
-/* 505 */       bf.newLine();
-/* 506 */       bf.write("    pr: " + g.pr[0] + ", " + g.pr[1] + ", " + g.pr[2]);
-/* 507 */       bf.newLine();
-/* 508 */       bf.write("  KillListener: ");
-/* 509 */       bf.newLine();
-/* 510 */       bf.write("    mobKill: " + g.mobKill);
-/* 511 */       bf.newLine();
-/* 512 */       if ((g.mob == null) || (g.mob.equals("")))
-/* 513 */         bf.write("    Mob: testMob");
+/* 564 */     for (int a = 0; a < gd.size(); a++) {
+/* 565 */       GateData g = (GateData)gd.get(a);
+/* 566 */       bf.write("Add Gate: " + g.name);
+/* 567 */       bf.newLine();
+/* 568 */       bf.write(" p1: " + g.p1[0] + ", " + g.p1[1] + ", " + g.p1[2]);
+/* 569 */       bf.newLine();
+/* 570 */       bf.write(" p2: " + g.p2[0] + ", " + g.p2[1] + ", " + g.p2[2]);
+/* 571 */       bf.newLine();
+/* 572 */       bf.write(" World: " + g.World);
+/* 573 */       bf.newLine();
+/* 574 */       bf.write(" Open: " + g.open);
+/* 575 */       bf.newLine();
+/* 576 */       bf.write(" timeGate: " + g.timeGate);
+/* 577 */       bf.newLine();
+/* 578 */       bf.write(" Redstone: ");
+/* 579 */       bf.newLine();
+/* 580 */       bf.write(" redstoneListener: " + g.redstoneListener);
+/* 581 */       bf.newLine();
+/* 582 */       bf.write(" pr: " + g.pr[0] + ", " + g.pr[1] + ", " + g.pr[2]);
+/* 583 */       bf.newLine();
+/* 584 */       bf.write(" KillListener: ");
+/* 585 */       bf.newLine();
+/* 586 */       bf.write(" mobKill: " + g.mobKill);
+/* 587 */       bf.newLine();
+/* 588 */       if ((g.mob == null) || (g.mob.equals("")))
+/* 589 */         bf.write(" Mob: testMob");
 /*     */       else
-/* 515 */         bf.write("    Mob: " + g.mob);
-/* 516 */       bf.newLine();
-/* 517 */       bf.write("    Kill Message: " + g.killMsg);
-/* 518 */       bf.newLine();
-/* 519 */       bf.write("  ButtonListener: ");
-/* 520 */       bf.newLine();
-/* 521 */       bf.write("    Button Listener: " + g.buttonListener);
-/* 522 */       bf.newLine();
-/* 523 */       bf.write("    ButtonInterval: " + g.ButtonInterval);
-/* 524 */       bf.newLine();
-/* 525 */       bf.write("    Button: " + g.button[0] + ", " + g.button[1] + ", " + g.button[2]);
-/* 526 */       bf.newLine();
-/* 527 */       bf.write("  Permissions: ");
-/* 528 */       bf.newLine();
-/* 529 */       bf.write("    Button Permission: " + g.buttonPerm);
-/* 530 */       bf.newLine();
-/* 531 */       bf.write("    Kill Permission: " + g.killPerm);
-/* 532 */       bf.newLine();
-/* 533 */       bf.write("    Open Permission: " + g.openPerm);
-/* 534 */       bf.newLine();
-/* 535 */       bf.write("    Close Permission: " + g.closePerm);
-/* 536 */       bf.newLine();
-/* 537 */       bf.write("  Material1: " + ((MaterialId)g.materials1.get(0)).getID() + ":" + ((MaterialId)g.materials1.get(0)).getData());
-/* 538 */       if (g.materials1.size() >= 2) {
-/* 539 */         for (int b = 1; b < g.materials1.size(); b++) {
-/* 540 */           bf.write(", " + ((MaterialId)g.materials1.get(b)).getID() + ":" + ((MaterialId)g.materials1.get(b)).getData());
+/* 591 */         bf.write(" Mob: " + g.mob);
+/* 592 */       bf.newLine();
+/* 593 */       bf.write(" Kill Message: " + g.killMsg);
+/* 594 */       bf.newLine();
+/* 595 */       bf.write(" ButtonListener: ");
+/* 596 */       bf.newLine();
+/* 597 */       bf.write(" Button Listener: " + g.buttonListener);
+/* 598 */       bf.newLine();
+/* 599 */       bf.write(" ButtonInterval: " + g.ButtonInterval);
+/* 600 */       bf.newLine();
+/* 601 */       bf.write(" Button: " + g.button[0] + ", " + g.button[1] + ", " + g.button[2]);
+/* 602 */       bf.newLine();
+/* 603 */       bf.write(" Permissions: ");
+/* 604 */       bf.newLine();
+/* 605 */       bf.write(" Button Permission: " + g.buttonPerm);
+/* 606 */       bf.newLine();
+/* 607 */       bf.write(" Kill Permission: " + g.killPerm);
+/* 608 */       bf.newLine();
+/* 609 */       bf.write(" Open Permission: " + g.openPerm);
+/* 610 */       bf.newLine();
+/* 611 */       bf.write(" Close Permission: " + g.closePerm);
+/* 612 */       bf.newLine();
+/* 613 */       bf.write(" Material1: " + ((MaterialId)g.materials1.get(0)).getID() + ":" + ((MaterialId)g.materials1.get(0)).getData());
+/* 614 */       if (g.materials1.size() >= 2) {
+/* 615 */         for (int b = 1; b < g.materials1.size(); b++) {
+/* 616 */           bf.write(", " + ((MaterialId)g.materials1.get(b)).getID() + ":" + ((MaterialId)g.materials1.get(b)).getData());
 /*     */         }
 /*     */       }
-/* 543 */       bf.newLine();
-/* 544 */       bf.write("  Material2: " + ((MaterialId)g.materials2.get(0)).getID() + ":" + ((MaterialId)g.materials2.get(0)).getData());
-/* 545 */       if (g.materials2.size() >= 2) {
-/* 546 */         for (int b = 1; b < g.materials2.size(); b++) {
-/* 547 */           bf.write(", " + ((MaterialId)g.materials2.get(b)).getID() + ":" + ((MaterialId)g.materials2.get(b)).getData());
+/* 619 */       bf.newLine();
+/* 620 */       bf.write(" Material2: " + ((MaterialId)g.materials2.get(0)).getID() + ":" + ((MaterialId)g.materials2.get(0)).getData());
+/* 621 */       if (g.materials2.size() >= 2) {
+/* 622 */         for (int b = 1; b < g.materials2.size(); b++) {
+/* 623 */           bf.write(", " + ((MaterialId)g.materials2.get(b)).getID() + ":" + ((MaterialId)g.materials2.get(b)).getData());
 /*     */         }
 /*     */       }
-/* 550 */       bf.newLine();
-/* 551 */       bf.write("End Gate");
-/* 552 */       bf.newLine();
-/* 553 */       bf.newLine();
+/* 626 */       bf.newLine();
+/* 627 */       bf.write("End Gate");
+/* 628 */       bf.newLine();
+/* 629 */       bf.newLine();
 /*     */     }
-/* 555 */     bf.flush();
-/* 556 */     bf.close();
+/* 631 */     bf.flush();
+/* 632 */     bf.close();
 /*     */   }
 /*     */ 
 /*     */   public static void SaveGroups(ArrayList<GateGroup> gg) throws Exception {
-/* 560 */     BufferedWriter bf = new BufferedWriter(new FileWriter("plugins/CityGates/groups.yml"));
-/* 561 */     bf.write("# CityGates - Groups");
-/* 562 */     bf.newLine();
-/* 563 */     bf.newLine();
-/* 564 */     bf.write("# Only edit everything after the ':'");
-/* 565 */     bf.newLine();
-/* 566 */     bf.write("# There are 3 defirent parameters: value, String, boolean");
-/* 567 */     bf.newLine();
-/* 568 */     bf.write("# Do not leave any parameter black!");
-/* 569 */     bf.newLine();
-/* 570 */     bf.newLine();
-/* 571 */     bf.write("# value: Any number without dots!");
-/* 572 */     bf.newLine();
-/* 573 */     bf.write("# String: Text");
-/* 574 */     bf.newLine();
-/* 575 */     bf.write("# Boolean: true/false");
-/* 576 */     bf.newLine();
-/* 577 */     bf.newLine();
+/* 636 */     BufferedWriter bf = new BufferedWriter(new FileWriter("plugins/CityGates/groups.yml"));
+/* 637 */     bf.write("# CityGates - Groups");
+/* 638 */     bf.newLine();
+/* 639 */     bf.newLine();
+/* 640 */     bf.write("# Only edit everything after the ':'");
+/* 641 */     bf.newLine();
+/* 642 */     bf.write("# There are 3 defirent parameters: value, String, boolean");
+/* 643 */     bf.newLine();
+/* 644 */     bf.write("# Do not leave any parameter black!");
+/* 645 */     bf.newLine();
+/* 646 */     bf.newLine();
+/* 647 */     bf.write("# value: Any number without dots!");
+/* 648 */     bf.newLine();
+/* 649 */     bf.write("# String: Text");
+/* 650 */     bf.newLine();
+/* 651 */     bf.write("# Boolean: true/false");
+/* 652 */     bf.newLine();
+/* 653 */     bf.newLine();
 /*     */ 
-/* 579 */     for (int a = 0; a < gg.size(); a++) {
-/* 580 */       GateGroup g = (GateGroup)gg.get(a);
-/* 581 */       bf.write("Add Group: " + g.name);
-/* 582 */       bf.newLine();
-/* 583 */       bf.write("  Delay: " + g.delay);
-/* 584 */       bf.newLine();
-/* 585 */       bf.write("  World: " + g.world);
-/* 586 */       bf.newLine();
-/* 587 */       bf.write("  Open: " + g.open);
-/* 588 */       bf.newLine();
-/* 589 */       bf.write("  timeGate: " + g.timegate);
-/* 590 */       bf.newLine();
-/* 591 */       bf.write("  Redstone: ");
-/* 592 */       bf.newLine();
-/* 593 */       bf.write("    redstoneListener: " + g.redstoneListener);
-/* 594 */       bf.newLine();
-/* 595 */       bf.write("    pr: " + g.pr[0] + ", " + g.pr[1] + ", " + g.pr[2]);
-/* 596 */       bf.newLine();
-/* 597 */       bf.write("  KillListener: ");
-/* 598 */       bf.newLine();
-/* 599 */       bf.write("    mobKill: " + g.mobKill);
-/* 600 */       bf.newLine();
-/* 601 */       if ((g.mob == null) || (g.mob.equals("")))
-/* 602 */         bf.write("    Mob: testMob");
+/* 655 */     for (int a = 0; a < gg.size(); a++) {
+/* 656 */       GateGroup g = (GateGroup)gg.get(a);
+/* 657 */       bf.write("Add Group: " + g.name);
+/* 658 */       bf.newLine();
+/* 659 */       bf.write(" Delay: " + g.delay);
+/* 660 */       bf.newLine();
+/* 661 */       bf.write(" World: " + g.world);
+/* 662 */       bf.newLine();
+/* 663 */       bf.write(" Open: " + g.open);
+/* 664 */       bf.newLine();
+/* 665 */       bf.write(" timeGate: " + g.timegate);
+/* 666 */       bf.newLine();
+/* 667 */       bf.write(" Redstone: ");
+/* 668 */       bf.newLine();
+/* 669 */       bf.write(" redstoneListener: " + g.redstoneListener);
+/* 670 */       bf.newLine();
+/* 671 */       bf.write(" pr: " + g.pr[0] + ", " + g.pr[1] + ", " + g.pr[2]);
+/* 672 */       bf.newLine();
+/* 673 */       bf.write(" KillListener: ");
+/* 674 */       bf.newLine();
+/* 675 */       bf.write(" mobKill: " + g.mobKill);
+/* 676 */       bf.newLine();
+/* 677 */       if ((g.mob == null) || (g.mob.equals("")))
+/* 678 */         bf.write(" Mob: testMob");
 /*     */       else
-/* 604 */         bf.write("    Mob: " + g.mob);
-/* 605 */       bf.newLine();
-/* 606 */       bf.write("    Kill Message: " + g.killMsg);
-/* 607 */       bf.newLine();
-/* 608 */       bf.write("  ButtonListener: ");
-/* 609 */       bf.newLine();
-/* 610 */       bf.write("    Button Listener: " + g.buttonListener);
-/* 611 */       bf.newLine();
-/* 612 */       bf.write("    ButtonInterval: " + g.ButtonInterval);
-/* 613 */       bf.newLine();
-/* 614 */       bf.write("    Button: " + g.button[0] + ", " + g.button[1] + ", " + g.button[2]);
-/* 615 */       bf.newLine();
-/* 616 */       bf.write("  Permissions: ");
-/* 617 */       bf.newLine();
-/* 618 */       bf.write("    Button Permission: " + g.buttonPerm);
-/* 619 */       bf.newLine();
-/* 620 */       bf.write("    Kill Permission: " + g.killPerm);
-/* 621 */       bf.newLine();
-/* 622 */       bf.write("    Open Permission: " + g.openPerm);
-/* 623 */       bf.newLine();
-/* 624 */       bf.write("    Close Permission: " + g.closePerm);
-/* 625 */       bf.newLine();
-/* 626 */       bf.write("  Children: ");
-/* 627 */       bf.newLine();
-/* 628 */       for (int b = 0; b < g.g.size(); b++) {
+/* 680 */         bf.write(" Mob: " + g.mob);
+/* 681 */       bf.newLine();
+/* 682 */       bf.write(" Kill Message: " + g.killMsg);
+/* 683 */       bf.newLine();
+/* 684 */       bf.write(" ButtonListener: ");
+/* 685 */       bf.newLine();
+/* 686 */       bf.write(" Button Listener: " + g.buttonListener);
+/* 687 */       bf.newLine();
+/* 688 */       bf.write(" ButtonInterval: " + g.ButtonInterval);
+/* 689 */       bf.newLine();
+/* 690 */       bf.write(" Button: " + g.button[0] + ", " + g.button[1] + ", " + g.button[2]);
+/* 691 */       bf.newLine();
+/* 692 */       bf.write(" Permissions: ");
+/* 693 */       bf.newLine();
+/* 694 */       bf.write(" Button Permission: " + g.buttonPerm);
+/* 695 */       bf.newLine();
+/* 696 */       bf.write(" Kill Permission: " + g.killPerm);
+/* 697 */       bf.newLine();
+/* 698 */       bf.write(" Open Permission: " + g.openPerm);
+/* 699 */       bf.newLine();
+/* 700 */       bf.write(" Close Permission: " + g.closePerm);
+/* 701 */       bf.newLine();
+/* 702 */       bf.write(" Children: ");
+/* 703 */       bf.newLine();
+/* 704 */       for (int b = 0; b < g.g.size(); b++) {
 /*     */         try {
-/* 630 */           Gate gate = (Gate)g.g.get(b);
-/* 631 */           bf.write("    " + gate.gd.name);
+/* 706 */           Gate gate = (Gate)g.g.get(b);
+/* 707 */           bf.write(" " + gate.gd.name);
 /*     */         } catch (Exception e) {
 /*     */           try {
-/* 634 */             GateGroup group = (GateGroup)g.g.get(b);
-/* 635 */             bf.write("    " + group.name); } catch (Exception ee) {
+/* 710 */             GateGroup group = (GateGroup)g.g.get(b);
+/* 711 */             bf.write(" " + group.name); } catch (Exception localException1) {
 /*     */           }
 /*     */         }
-/* 638 */         bf.newLine();
+/* 714 */         bf.newLine();
 /*     */       }
-/* 640 */       bf.write("  End Children");
-/* 641 */       bf.newLine();
-/* 642 */       bf.write("End Group");
-/* 643 */       bf.newLine();
-/* 644 */       bf.newLine();
+/* 716 */       bf.write(" End Children");
+/* 717 */       bf.newLine();
+/* 718 */       bf.write("End Group");
+/* 719 */       bf.newLine();
+/* 720 */       bf.newLine();
 /*     */     }
-/* 646 */     bf.flush();
-/* 647 */     bf.close();
+/* 722 */     bf.flush();
+/* 723 */     bf.close();
+/*     */   }
+/*     */ 
+/*     */   public static void SaveGereral(General g) throws IOException {
+/* 727 */     BufferedWriter bf = new BufferedWriter(new FileWriter("plugins/CityGates/general.yml"));
+/* 728 */     bf.write("# CityGates - General");
+/* 729 */     bf.newLine();
+/* 730 */     bf.newLine();
+/* 731 */     bf.write("# Only edit everything after the ':'");
+/* 732 */     bf.newLine();
+/* 733 */     bf.write("# There are 2 defirent parameters: value, boolean");
+/* 734 */     bf.newLine();
+/* 735 */     bf.write("# Do not leave any parameter black!");
+/* 736 */     bf.newLine();
+/* 737 */     bf.newLine();
+/* 738 */     bf.write("# value: Any number (can with dots!)");
+/* 739 */     bf.newLine();
+/* 740 */     bf.write("# String: Text");
+/* 741 */     bf.newLine();
+/* 742 */     bf.write("# Boolean: true/false");
+/* 743 */     bf.newLine();
+/* 744 */     bf.newLine();
+/* 745 */     bf.write("#Time in hours");
+/* 746 */     bf.newLine();
+/* 747 */     double ms = g.updateTime;
+/* 748 */     bf.write("UpdateTime: " + ms / 3600000.0D);
+/* 749 */     bf.newLine();
+/* 750 */     bf.write("#Show update Message");
+/* 751 */     bf.newLine();
+/* 752 */     bf.write("Update msg: " + g.updateMsg);
+/* 753 */     bf.newLine();
+/* 754 */     bf.write("#Time when it toggles to day (number between 0-24000");
+/* 755 */     bf.newLine();
+/* 756 */     bf.write("Day: " + g.day);
+/* 757 */     bf.newLine();
+/* 758 */     bf.write("#Time when it toggles to night (number between 0-24000");
+/* 759 */     bf.newLine();
+/* 760 */     bf.write("Night: " + g.night);
+/* 761 */     bf.close();
 /*     */   }
 /*     */ 
 /*     */   public static ArrayList<GateData> Load() throws IOException, ClassNotFoundException {
-/* 651 */     FileInputStream fis = new FileInputStream("plugins/CityGates/gates.yml");
-/* 652 */     int lines = fis.available();
-/* 653 */     fis.close();
-/* 654 */     if (lines == 0) {
-/* 655 */       throw new IOException("File is empty");
+/* 765 */     FileInputStream fis = new FileInputStream("plugins/CityGates/gates.yml");
+/* 766 */     int lines = fis.available();
+/* 767 */     fis.close();
+/* 768 */     if (lines == 0) {
+/* 769 */       throw new IOException("File is empty");
 /*     */     }
-/* 657 */     ObjectInputStream in = new ObjectInputStream(fis);
-/* 658 */     GateData[] gd = (GateData[])in.readObject();
-/* 659 */     in.close();
-/* 660 */     ArrayList dd = new ArrayList();
-/* 661 */     for (int a = 0; a < gd.length; a++) {
-/* 662 */       dd.add(gd[a]);
+/* 771 */     ObjectInputStream in = new ObjectInputStream(fis);
+/* 772 */     GateData[] gd = (GateData[])in.readObject();
+/* 773 */     in.close();
+/* 774 */     ArrayList dd = new ArrayList();
+/* 775 */     for (int a = 0; a < gd.length; a++) {
+/* 776 */       dd.add(gd[a]);
 /*     */     }
-/* 664 */     return dd;
+/* 778 */     return dd;
 /*     */   }
 /*     */ 
 /*     */   public static void Save(ArrayList<GateData> dd) throws IOException {
-/* 668 */     GateData[] gd = new GateData[dd.size()];
-/* 669 */     for (int a = 0; a < dd.size(); a++) {
-/* 670 */       gd[a] = ((GateData)dd.get(a));
+/* 782 */     GateData[] gd = new GateData[dd.size()];
+/* 783 */     for (int a = 0; a < dd.size(); a++) {
+/* 784 */       gd[a] = ((GateData)dd.get(a));
 /*     */     }
 /*     */ 
-/* 673 */     FileOutputStream fos = new FileOutputStream("plugins/CityGates/gates.yml");
-/* 674 */     ObjectOutputStream out = new ObjectOutputStream(fos);
-/* 675 */     out.writeObject(gd);
-/* 676 */     out.flush();
-/* 677 */     fos.close();
-/* 678 */     out.close();
+/* 787 */     FileOutputStream fos = new FileOutputStream("plugins/CityGates/gates.yml");
+/* 788 */     ObjectOutputStream out = new ObjectOutputStream(fos);
+/* 789 */     out.writeObject(gd);
+/* 790 */     out.flush();
+/* 791 */     fos.close();
+/* 792 */     out.close();
 /*     */   }
 /*     */ 
 /*     */   public static void mdir() {
 /*     */     try {
-/* 683 */       File root = new File("plugins/CityGates/");
-/* 684 */       root.mkdirs();
-/* 685 */       File gates = new File("plugins/CityGates/gates.yml");
-/* 686 */       gates.createNewFile();
-/* 687 */       File groups = new File("plugins/CityGates/groups.yml");
-/* 688 */       groups.createNewFile();
+/* 797 */       File root = new File("plugins/CityGates/");
+/* 798 */       root.mkdirs();
+/* 799 */       File gates = new File("plugins/CityGates/gates.yml");
+/* 800 */       gates.createNewFile();
+/* 801 */       File groups = new File("plugins/CityGates/groups.yml");
+/* 802 */       groups.createNewFile();
+/* 803 */       File gerneral = new File("plugins/CityGates/gerneral.yml");
+/* 804 */       if (gerneral.exists()) {
+/* 805 */         gerneral.delete();
+/*     */       }
+/* 807 */       File general = new File("plugins/CityGates/general.yml");
+/* 808 */       general.createNewFile();
 /*     */     } catch (Exception e) {
-/* 690 */       e.printStackTrace();
+/* 810 */       e.printStackTrace();
 /*     */     }
+/*     */   }
+/*     */ 
+/*     */   public static void RemoveOldDownloader(Plugin p) {
+/* 815 */     Plugin[] plugins = p.getServer().getPluginManager().getPlugins();
+/* 816 */     for (int a = 0; a < plugins.length; a++)
+/* 817 */       if (plugins[a].getName().equalsIgnoreCase("CityGates_Updater"))
+/* 818 */         JOptionPane.showConfirmDialog(null, "A Outdated plugin has been found: CityGates_Updater.jar\n\nPlease, Stop the server and delete this file manually", "Outdated file Found!", 0);
 /*     */   }
 /*     */ }
 
-/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates (1).jar
+/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates (2).jar
  * Qualified Name:     citygates.Config
  * JD-Core Version:    0.6.2
  */

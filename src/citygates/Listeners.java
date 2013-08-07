@@ -10,15 +10,15 @@
 /*    */ {
 /*    */   private int oldTime;
 /*    */ 
-/*    */   public Listeners(Plugin p)
+/*    */   public Listeners(Plugin p, General g)
 /*    */   {
-/*  8 */     p.getServer().getScheduler().scheduleAsyncRepeatingTask(p, new Time((World)p.getServer().getWorlds().get(0))
+/* 15 */     p.getServer().getScheduler().runTaskTimerAsynchronously(p, new Time((World)p.getServer().getWorlds().get(0), g.day, g.night)
 /*    */     {
 /*    */       public void setTime(int time)
 /*    */       {
-/* 12 */         if (Listeners.this.oldTime != time) {
-/* 13 */           Listeners.this.onTimeChanged(time);
-/* 14 */           Listeners.this.oldTime = time;
+/* 19 */         if (Listeners.this.oldTime != time) {
+/* 20 */           Listeners.this.onTimeChanged(time);
+/* 21 */           Listeners.this.oldTime = time;
 /*    */         }
 /*    */       }
 /*    */     }
@@ -28,7 +28,7 @@
 /*    */   public abstract void onTimeChanged(int paramInt);
 /*    */ }
 
-/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates (1).jar
+/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates (2).jar
  * Qualified Name:     citygates.Listeners
  * JD-Core Version:    0.6.2
  */
