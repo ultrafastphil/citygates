@@ -29,6 +29,7 @@
 /*     */   implements Listener
 /*     */ {
 /*     */   private Commands exe;
+/*     */   private Downloader downloader;
 /*     */   private Listeners l;
 /*     */   private ArrayList<GateData> gd;
 /*     */   private ArrayList<Gate> g;
@@ -36,118 +37,130 @@
 /*     */ 
 /*     */   public void onEnable()
 /*     */   {
-/*  26 */     this.l = new Listeners(this) {
+/*  28 */     this.l = new Listeners(this) {
 /*     */       public void onTimeChanged(int time) {
-/*  28 */         for (int a = 0; a < main.this.g.size(); a++) {
-/*  29 */           if (((Gate)main.this.g.get(a)).gd.timeGate) {
-/*  30 */             ((Gate)main.this.g.get(a)).setTime(time);
+/*  30 */         for (int a = 0; a < main.this.g.size(); a++) {
+/*  31 */           if (((Gate)main.this.g.get(a)).gd.timeGate) {
+/*  32 */             ((Gate)main.this.g.get(a)).setTime(time);
 /*     */           }
 /*     */         }
-/*  33 */         for (int a = 0; a < main.this.gg.size(); a++)
-/*  34 */           if (((GateGroup)main.this.gg.get(a)).timegate)
-/*  35 */             ((GateGroup)main.this.gg.get(a)).setTime(time);
+/*  35 */         for (int a = 0; a < main.this.gg.size(); a++)
+/*  36 */           if (((GateGroup)main.this.gg.get(a)).timegate)
+/*  37 */             ((GateGroup)main.this.gg.get(a)).setTime(time);
 /*     */       }
 /*     */     };
-/*  40 */     getServer().getPluginManager().registerEvents(this, this);
+/*  42 */     getServer().getPluginManager().registerEvents(this, this);
 /*     */ 
-/*  43 */     this.gd = new ArrayList();
+/*  45 */     this.gd = new ArrayList();
 /*     */ 
-/*  45 */     Config.mdir();
+/*  47 */     Config.mdir();
 /*     */     try {
-/*  47 */       this.gd = Config.LoadGates(this);
+/*  49 */       this.gd = Config.LoadGates(this);
 /*     */     } catch (Exception ex) {
-/*  49 */       getLogger().info("No Gates Found!");
+/*  51 */       getLogger().info("No Gates Found!");
 /*     */     }
 /*     */ 
-/*  52 */     if (this.gd.size() == 0) {
-/*  53 */       this.g = new ArrayList();
-/*     */     } else {
+/*  54 */     if (this.gd.size() == 0) {
 /*  55 */       this.g = new ArrayList();
-/*  56 */       for (int a = 0; a < this.gd.size(); a++) {
-/*  57 */         this.g.add(new Gate((GateData)this.gd.get(a), this));
+/*     */     } else {
+/*  57 */       this.g = new ArrayList();
+/*  58 */       for (int a = 0; a < this.gd.size(); a++) {
+/*  59 */         this.g.add(new Gate((GateData)this.gd.get(a), this));
 /*     */       }
 /*     */     }
-/*  60 */     this.gg = new ArrayList();
+/*  62 */     this.gg = new ArrayList();
 /*     */     try {
-/*  62 */       this.gg = Config.LoadGroups(this.g, this);
+/*  64 */       this.gg = Config.LoadGroups(this.g, this);
 /*     */     } catch (Exception e) {
-/*  64 */       getLogger().info("No Groups Found!");
+/*  66 */       getLogger().info("No Groups Found!");
 /*     */     }
-/*  66 */     this.exe = new Commands(this, this.g, this.gg);
-/*  67 */     new Downloader(this);
+/*  68 */     this.exe = new Commands(this, this.g, this.gg)
+/*     */     {
+/*     */       public void setGateGroup(ArrayList<GateGroup> group)
+/*     */       {
+/*  72 */         main.this.gg = group;
+/*     */       }
+/*     */ 
+/*     */       public void setGate(ArrayList<Gate> gate)
+/*     */       {
+/*  77 */         main.this.g = gate;
+/*     */       }
+/*     */     };
+/*  80 */     this.downloader = new Downloader(this);
 /*     */   }
 /*     */ 
 /*     */   public void onDisable()
 /*     */   {
-/*  72 */     this.gd = new ArrayList();
-/*  73 */     for (int a = 0; a < this.g.size(); a++) {
-/*  74 */       GateData gatedata = ((Gate)this.g.get(a)).gd;
-/*  75 */       this.gd.add(gatedata);
+/*  85 */     this.gd = new ArrayList();
+/*  86 */     for (int a = 0; a < this.g.size(); a++) {
+/*  87 */       GateData gatedata = ((Gate)this.g.get(a)).gd;
+/*  88 */       this.gd.add(gatedata);
 /*     */     }
-/*  77 */     getLogger().info(String.valueOf(this.gd.size()));
+/*  90 */     getLogger().info(String.valueOf(this.gd.size()));
 /*     */     try {
-/*  79 */       Config.SaveGates(this.gd);
+/*  92 */       Config.SaveGates(this.gd);
 /*     */     } catch (Exception ex) {
-/*  81 */       getLogger().log(Level.SEVERE, null, ex);
+/*  94 */       getLogger().log(Level.SEVERE, null, ex);
 /*     */     }
 /*     */     try {
-/*  84 */       Config.SaveGroups(this.gg);
+/*  97 */       Config.SaveGroups(this.gg);
 /*     */     } catch (Exception e) {
-/*  86 */       getLogger().log(Level.SEVERE, null, e);
+/*  99 */       getLogger().log(Level.SEVERE, null, e);
 /*     */     }
-/*  88 */     for (int a = 0; a < this.g.size(); a++) {
-/*  89 */       ((Gate)this.g.get(a)).Close();
-/*     */     }
-/*  91 */     getServer().getScheduler().cancelAllTasks();
+/* 101 */     getServer().getScheduler().cancelAllTasks();
 /*     */   }
 /*     */ 
 /*     */   public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings)
 /*     */   {
-/*  96 */     boolean command = this.exe.onCommand(cs, cmnd, string, strings);
-/*  97 */     this.gd = new ArrayList();
-/*  98 */     for (int a = 0; a < this.g.size(); a++) {
-/*  99 */       GateData gatedata = ((Gate)this.g.get(a)).gd;
-/* 100 */       this.gd.add(gatedata);
+/* 106 */     boolean command = false;
+/* 107 */     if ((cs instanceof Player))
+/* 108 */       command = this.exe.onCommand(cs, cmnd, string, strings);
+/*     */     else
+/* 110 */       command = this.downloader.onCommand(cs, cmnd, string, strings);
+/* 111 */     this.gd = new ArrayList();
+/* 112 */     for (int a = 0; a < this.g.size(); a++) {
+/* 113 */       GateData gatedata = ((Gate)this.g.get(a)).gd;
+/* 114 */       this.gd.add(gatedata);
 /*     */     }
 /*     */     try {
-/* 103 */       Config.SaveGates(this.gd);
+/* 117 */       Config.SaveGates(this.gd);
 /*     */     } catch (Exception ex) {
-/* 105 */       getLogger().log(Level.SEVERE, null, ex);
+/* 119 */       getLogger().log(Level.SEVERE, null, ex);
 /*     */     }
 /*     */     try {
-/* 108 */       Config.SaveGroups(this.gg);
+/* 122 */       Config.SaveGroups(this.gg);
 /*     */     } catch (Exception e) {
-/* 110 */       getLogger().log(Level.SEVERE, null, e);
+/* 124 */       getLogger().log(Level.SEVERE, null, e);
 /*     */     }
-/* 112 */     return command;
+/* 126 */     return command;
 /*     */   }
 /*     */ 
 /*     */   @EventHandler(priority=EventPriority.HIGHEST)
 /*     */   public void onRedstoneListener(BlockRedstoneEvent event)
 /*     */   {
-/* 118 */     for (int a = 0; a < this.g.size(); a++) {
-/* 119 */       if (((Gate)this.g.get(a)).gd.redstoneListener) {
-/* 120 */         Location l = event.getBlock().getLocation();
-/* 121 */         if ((l.getBlockX() == ((Gate)this.g.get(a)).gd.pr[0]) && (l.getBlockY() == ((Gate)this.g.get(a)).gd.pr[1]) && (l.getBlockZ() == ((Gate)this.g.get(a)).gd.pr[2]) && (l.getWorld().getName().equals(((Gate)this.g.get(a)).gd.World)))
+/* 132 */     for (int a = 0; a < this.g.size(); a++) {
+/* 133 */       if (((Gate)this.g.get(a)).gd.redstoneListener) {
+/* 134 */         Location l = event.getBlock().getLocation();
+/* 135 */         if ((l.getBlockX() == ((Gate)this.g.get(a)).gd.pr[0]) && (l.getBlockY() == ((Gate)this.g.get(a)).gd.pr[1]) && (l.getBlockZ() == ((Gate)this.g.get(a)).gd.pr[2]) && (l.getWorld().getName().equals(((Gate)this.g.get(a)).gd.World)))
 /*     */         {
-/* 125 */           if (!((Gate)this.g.get(a)).gd.open)
-/* 126 */             ((Gate)this.g.get(a)).Open();
+/* 139 */           if (!((Gate)this.g.get(a)).gd.open)
+/* 140 */             ((Gate)this.g.get(a)).Open();
 /*     */           else {
-/* 128 */             ((Gate)this.g.get(a)).Close();
+/* 142 */             ((Gate)this.g.get(a)).Close();
 /*     */           }
 /*     */         }
 /*     */       }
 /*     */     }
 /*     */ 
-/* 134 */     for (int a = 0; a < this.gg.size(); a++)
-/* 135 */       if (((GateGroup)this.gg.get(a)).redstoneListener) {
-/* 136 */         Location l = event.getBlock().getLocation();
-/* 137 */         if ((l.getBlockX() == ((GateGroup)this.gg.get(a)).pr[0]) && (l.getBlockY() == ((GateGroup)this.gg.get(a)).pr[1]) && (l.getBlockZ() == ((GateGroup)this.gg.get(a)).pr[2]) && (l.getWorld().getName().equals(((GateGroup)this.gg.get(a)).world)))
+/* 148 */     for (int a = 0; a < this.gg.size(); a++)
+/* 149 */       if (((GateGroup)this.gg.get(a)).redstoneListener) {
+/* 150 */         Location l = event.getBlock().getLocation();
+/* 151 */         if ((l.getBlockX() == ((GateGroup)this.gg.get(a)).pr[0]) && (l.getBlockY() == ((GateGroup)this.gg.get(a)).pr[1]) && (l.getBlockZ() == ((GateGroup)this.gg.get(a)).pr[2]) && (l.getWorld().getName().equals(((GateGroup)this.gg.get(a)).world)))
 /*     */         {
-/* 141 */           if (!((GateGroup)this.gg.get(a)).open)
-/* 142 */             ((GateGroup)this.gg.get(a)).Open();
+/* 155 */           if (!((GateGroup)this.gg.get(a)).open)
+/* 156 */             ((GateGroup)this.gg.get(a)).Open();
 /*     */           else
-/* 144 */             ((GateGroup)this.gg.get(a)).Close();
+/* 158 */             ((GateGroup)this.gg.get(a)).Close();
 /*     */         }
 /*     */       }
 /*     */   }
@@ -155,27 +168,47 @@
 /*     */   @EventHandler(priority=EventPriority.HIGHEST)
 /*     */   public void onKillListener(EntityDeathEvent event)
 /*     */   {
-/* 153 */     for (int a = 0; a < this.g.size(); a++) {
+/* 167 */     for (int a = 0; a < this.g.size(); a++) {
 /*     */       try {
-/* 155 */         if ((((Gate)this.g.get(a)).gd.mobKill) && 
-/* 156 */           (((Gate)this.g.get(a)).gd.mob.equals(event.getEntityType().getName())) && (((Gate)this.g.get(a)).gd.World.equals(event.getEntity().getWorld().getName()))) {
-/* 157 */           ((Gate)this.g.get(a)).Open();
-/* 158 */           if (((Gate)this.g.get(a)).gd.killMsg != null)
-/* 159 */             event.getEntity().getKiller().sendMessage(((Gate)this.g.get(a)).gd.killMsg);
-/*     */         }
+/* 169 */         if ((((Gate)this.g.get(a)).gd.mobKill) && 
+/* 170 */           (((Gate)this.g.get(a)).gd.mob.equals(event.getEntityType().getName())) && (((Gate)this.g.get(a)).gd.World.equals(event.getEntity().getWorld().getName())))
+/* 171 */           if (((((Gate)this.g.get(a)).gd.killPerm) && (event.getEntity().getKiller().hasPermission("citygates.user.gate." + ((Gate)this.g.get(a)).gd.name))) || ((((Gate)this.g.get(a)).gd.killPerm) && (event.getEntity().getKiller().hasPermission("citygates.user.gate.*"))))
+/*     */           {
+/* 173 */             ((Gate)this.g.get(a)).Open();
+/* 174 */             if (((Gate)this.g.get(a)).gd.killMsg != null)
+/* 175 */               event.getEntity().getKiller().sendMessage(((Gate)this.g.get(a)).gd.killMsg);
+/*     */           }
+/* 177 */           else if (!((Gate)this.g.get(a)).gd.killPerm) {
+/* 178 */             ((Gate)this.g.get(a)).Open();
+/* 179 */             if (((Gate)this.g.get(a)).gd.killMsg != null)
+/* 180 */               event.getEntity().getKiller().sendMessage(((Gate)this.g.get(a)).gd.killMsg);
+/*     */           }
+/*     */           else {
+/* 183 */             event.getEntity().getKiller().sendMessage("You don't have Permssion to use this Gate!");
+/*     */           }
 /*     */       }
 /*     */       catch (Exception e)
 /*     */       {
 /*     */       }
 /*     */     }
-/* 166 */     for (int a = 0; a < this.gg.size(); a++)
+/* 190 */     for (int a = 0; a < this.gg.size(); a++)
 /*     */       try {
-/* 168 */         if ((((GateGroup)this.gg.get(a)).mobKill) && 
-/* 169 */           (((GateGroup)this.gg.get(a)).mob.equals(event.getEntityType().getName())) && (((GateGroup)this.gg.get(a)).world.equals(event.getEntity().getWorld().getName()))) {
-/* 170 */           ((GateGroup)this.gg.get(a)).Open();
-/* 171 */           if (((GateGroup)this.gg.get(a)).killMsg != null)
-/* 172 */             event.getEntity().getKiller().sendMessage(((GateGroup)this.gg.get(a)).killMsg);
-/*     */         }
+/* 192 */         if ((((GateGroup)this.gg.get(a)).mobKill) && 
+/* 193 */           (((GateGroup)this.gg.get(a)).mob.equals(event.getEntityType().getName())) && (((GateGroup)this.gg.get(a)).world.equals(event.getEntity().getWorld().getName())))
+/* 194 */           if (((((GateGroup)this.gg.get(a)).killPerm) && (event.getEntity().getKiller().hasPermission("citygates.user.gate." + ((GateGroup)this.gg.get(a)).name))) || ((((GateGroup)this.gg.get(a)).killPerm) && (event.getEntity().getKiller().hasPermission("citygates.user.gate.*"))))
+/*     */           {
+/* 196 */             ((GateGroup)this.gg.get(a)).Open();
+/* 197 */             if (((GateGroup)this.gg.get(a)).killMsg != null)
+/* 198 */               event.getEntity().getKiller().sendMessage(((GateGroup)this.gg.get(a)).killMsg);
+/*     */           }
+/* 200 */           else if (!((GateGroup)this.gg.get(a)).killPerm) {
+/* 201 */             ((GateGroup)this.gg.get(a)).Open();
+/* 202 */             if (((GateGroup)this.gg.get(a)).killMsg != null)
+/* 203 */               event.getEntity().getKiller().sendMessage(((GateGroup)this.gg.get(a)).killMsg);
+/*     */           }
+/*     */           else {
+/* 206 */             event.getEntity().getKiller().sendMessage("You don't have Permssion to use this Gate!");
+/*     */           }
 /*     */       }
 /*     */       catch (Exception e)
 /*     */       {
@@ -184,50 +217,67 @@
 /*     */ 
 /*     */   @EventHandler(priority=EventPriority.HIGHEST)
 /*     */   public void onButtonClicked(PlayerInteractEvent event) {
-/* 182 */     if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && (event.getClickedBlock().getType().equals(Material.STONE_BUTTON))) {
-/* 183 */       for (int a = 0; a < this.g.size(); a++) {
-/* 184 */         if (((Gate)this.g.get(a)).gd.buttonListener) {
-/* 185 */           int[] button = ((Gate)this.g.get(a)).gd.button;
-/* 186 */           if ((button[0] == event.getClickedBlock().getX()) && (button[1] == event.getClickedBlock().getY()) && (button[2] == event.getClickedBlock().getZ()))
+/* 216 */     if ((event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) && (event.getClickedBlock().getType().equals(Material.STONE_BUTTON))) {
+/* 217 */       for (int a = 0; a < this.g.size(); a++) {
+/* 218 */         if (((Gate)this.g.get(a)).gd.buttonListener) {
+/* 219 */           int[] button = ((Gate)this.g.get(a)).gd.button;
+/* 220 */           if ((button[0] == event.getClickedBlock().getX()) && (button[1] == event.getClickedBlock().getY()) && (button[2] == event.getClickedBlock().getZ()))
 /*     */           {
-/* 189 */             ((Gate)this.g.get(a)).Open();
-/* 190 */             final int b = a;
-/* 191 */             new Thread(new Runnable() {
-/*     */               public void run() {
-/*     */                 try {
-/* 194 */                   Thread.sleep(((Gate)main.this.g.get(b)).gd.ButtonInterval); } catch (InterruptedException ex) {
-/*     */                 }
-/* 196 */                 ((Gate)main.this.g.get(b)).Close();
-/*     */               }
-/*     */             }).start();
+/* 223 */             if ((((Gate)this.g.get(a)).gd.buttonPerm) && (event.getPlayer().hasPermission("citygates.user.gate." + ((Gate)this.g.get(a)).gd.name)))
+/* 224 */               ButtonAction((Gate)this.g.get(a));
+/* 225 */             else if (!((Gate)this.g.get(a)).gd.buttonPerm)
+/* 226 */               ButtonAction((Gate)this.g.get(a));
+/*     */             else {
+/* 228 */               event.getPlayer().sendMessage("You don't have Permssion to use this Gate!");
+/*     */             }
 /*     */           }
-/*     */ 
 /*     */         }
-/*     */ 
 /*     */       }
 /*     */ 
-/* 203 */       for (int a = 0; a < this.gg.size(); a++)
-/* 204 */         if (((GateGroup)this.gg.get(a)).buttonListener) {
-/* 205 */           int[] button = ((GateGroup)this.gg.get(a)).button;
-/* 206 */           if ((button[0] == event.getClickedBlock().getX()) && (button[1] == event.getClickedBlock().getY()) && (button[2] == event.getClickedBlock().getZ()))
+/* 234 */       for (int a = 0; a < this.gg.size(); a++)
+/* 235 */         if (((GateGroup)this.gg.get(a)).buttonListener) {
+/* 236 */           int[] button = ((GateGroup)this.gg.get(a)).button;
+/* 237 */           if ((button[0] == event.getClickedBlock().getX()) && (button[1] == event.getClickedBlock().getY()) && (button[2] == event.getClickedBlock().getZ()))
 /*     */           {
-/* 209 */             ((GateGroup)this.gg.get(a)).Open();
-/* 210 */             final int b = a;
-/* 211 */             new Thread(new Runnable() {
-/*     */               public void run() {
-/*     */                 try {
-/* 214 */                   Thread.sleep(((GateGroup)main.this.gg.get(b)).ButtonInterval); } catch (InterruptedException ex) {
-/*     */                 }
-/* 216 */                 ((GateGroup)main.this.gg.get(b)).Close();
-/*     */               }
-/*     */             }).start();
+/* 240 */             if ((((GateGroup)this.gg.get(a)).buttonPerm) && (event.getPlayer().hasPermission("citygates.user.gate." + ((GateGroup)this.gg.get(a)).name)))
+/* 241 */               ButtonAction((GateGroup)this.gg.get(a));
+/* 242 */             else if (!((GateGroup)this.gg.get(a)).buttonPerm)
+/* 243 */               ButtonAction((GateGroup)this.gg.get(a));
+/*     */             else
+/* 245 */               event.getPlayer().sendMessage("You don't have Permssion to use this Gate!");
 /*     */           }
 /*     */         }
 /*     */     }
 /*     */   }
+/*     */ 
+/*     */   private void ButtonAction(final Gate gate)
+/*     */   {
+/* 254 */     gate.Open();
+/* 255 */     new Thread(new Runnable() {
+/*     */       public void run() {
+/*     */         try {
+/* 258 */           Thread.sleep(gate.gd.ButtonInterval); } catch (InterruptedException ex) {
+/*     */         }
+/* 260 */         gate.Close();
+/*     */       }
+/*     */     }).start();
+/*     */   }
+/*     */ 
+/*     */   private void ButtonAction(final GateGroup group)
+/*     */   {
+/* 266 */     group.Open();
+/* 267 */     new Thread(new Runnable() {
+/*     */       public void run() {
+/*     */         try {
+/* 270 */           Thread.sleep(group.ButtonInterval); } catch (InterruptedException ex) {
+/*     */         }
+/* 272 */         group.Close();
+/*     */       }
+/*     */     }).start();
+/*     */   }
 /*     */ }
 
-/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates.jar
+/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates (1).jar
  * Qualified Name:     citygates.main
  * JD-Core Version:    0.6.2
  */

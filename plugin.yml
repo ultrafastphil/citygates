@@ -1,117 +1,214 @@
 name: CityGates
 main: citygates.main
-version: 1.1
+version: 1.2
 
 commands:
-  gcreate:
-    description: Create a gate.
-    usage: /<command> [GateName]
-    permission: citygates.admin.gate
-    permission-message: You don't have Permission to create gates.
- 
+    gcreate:
+        description: Create a gate.
+        usage: /<command> [GateName] <Direction>
     
-  gp1:
-    description: Select point 1
-    usage: /<command>
-    permission: citygates.admin.p1
-    permission-message: You don't have Permission to create gates.
+    gp1:
+        description: Select point 1
+        usage: /<command>
     
-  gp2:
-    description: Select point 2
-    usage: /<command>
-    permission: citygates.admin.p2
-    permission-message: You don't have Permission to create gates.  
+    gp2:
+        description: Select point 2
+        usage: /<command>
     
-  gopen:
-    description: Open Gate
-    usage: /<command> [Gate]
-    permission: citygates.user.open
-    permission-message: You don't have Permission to open gates.
+    gopen:
+        description: Open Gate
+        usage: /<command> [Gate]
       
-  gclose:
-    description: Close Gate
-    usage: /<command> [Gate]
-    permission: citygates.user.close
-    permission-message: You don't have Permission to close gates.
+    gclose:
+        description: Close Gate
+        usage: /<command> [Gate]
         
-  glist:
-    description: list all the Gates
-    usage: /<command>
-    permission: citygates.user.list
-    permission-message: You don't have Permission to list gates.
+    glist:
+        description: list all the Gates
+        usage: /<command>
         
-  gremove:
-    description: remove Gate
-    usage: /<command> [Gate]
-    permission: citygates.admin.remove
-    permission-message: You don't have Permission to remove gates.
+    gremove:
+        description: remove Gate/Group
+        usage: /<command> [Gate/Group] <all>
         
-  gtimegate:
-    description: Gate open and close by time
-    usage: /<command> [Gate] [true/false]
-    permission: citygates.admin.timegate
-    permission-message: You don't have Permission to add timegate gates.
+    gtimegate:
+        description: Gate open and close by time
+        usage: /<command> [Gate] [true/false]
     
-  ginfo:
-    description: Info about a gate
-    usage: /<command> [Gate]
-    permission: citygates.user.info
-    permission-message: You don't have Permission to get the info from the gates.
+    ginfo:
+        description: Info about a gate
+        usage: /<command> [Gate]
     
-  gredstone:
-    description: Add or remove redstone listener
-    usage: /<command> [Gate] [true/false] look at the redstone!
-    permission: citygates.admin.redstone
-    permission-message: You don't have Permission to create Gates
+    gredstone:
+        description: Add or remove redstone listener
+        usage: /<command> [Gate] [true/false] look at the redstone!
     
-  gkill:
-    description: Gates open when a mob is killed
-    usage: /<command> [Gate] [mob / del] [Kill message]
-    permission: citygates.admin.kill
-    permission-message: You don't have Permissions to do that!
+    gkill:
+        description: Gates open when a mob is killed
+        usage: /<command> [Gate] [mob / del] [Kill message]
     
-  clear:
-    description: Clear inventory of you or another player
-    usage: /<command> [Player]
-    permission: citygates.admin.clear
-    permission-message: You don't have Permissions to do that!
+    clear:
+        description: Clear inventory of you or another player
+        usage: /<command> [Player]
     
-  ghelp:
-    description: Show all the commands!
-    usage: /<command> [number]
-    permission: citygates.user.help
-    permission-messge: you don't have Permissions to this Plugin!
+    ghelp:
+        description: Show all the commands!
+        usage: /<command> [number]
     
-  gbutton:
-    description: add a button Listener!
-    usage: /<command> [Gate] [true/false] [time delay (in milli seconds)]
-    permissions: citygates.admin.button
-    permission-messge: you don't have Permissions to this Plugin!
+    gbutton:
+        description: add a button Listener!
+        usage: /<command> [Gate] [true/false] [time delay (in milli seconds)]
     
-  ggroup:
-    description: Commands for group!
-    usage: /<command>
-    permissions: citygates.admin.group
-    permission-messge: you don't have Permissions to this Plugin!
-  
-  permissions:
+    ggroup:
+        description: Commands for group!
+        usage: /<command>
+    
+    greload:
+        description: Reload Config
+        usage: /<command>
+    
+    gshow:
+        description: Show selection
+        usage: /<command>
+    
+    gupdate:
+        description: Update
+        usage: /<command> 
+    
+    gcheck:
+        description: Check for updates
+        usage: /<command>
+        
+    gsetperm:
+        description: setPermissions for a gate
+        usage: /<command> [gate/group] [all/open/close/kill/button] [true/false]
+        
+    gsetclose:
+        description: set blocks when gate is close
+        usage: /<command> [gate]
+        
+    gsetopen:
+        description: set blocks when gate is open
+        usage: /<command> [gate]
+        
+    gsetanimation:
+        description: add Animation to a Gate
+        usage: /<command> [Gate] [Direction]
+          
+permissions:
     citygates.admin.*:
-      description: Gives acces to all admin commands
-      children:
-        citygates.admin.p1
-        citygates.admin.p2
-        citygates.admin.gate
-        citygates.admin.remove
-        citygates.admin.timegate
-        citygates.admin.redstone
-        citygates.admin.kill
-        citygates.admin.clear
-        
+        description: Gives access to all doorman commands
+        children:
+            citygates.admin.p1: true
+            citygates.admin.p2: true
+            citygates.admin.show: true
+            citygates.admin.create: true
+            citygates.admin.remove: true
+            citygates.admin.timegate: true
+            citygates.admin.redstone: true
+            citygates.admin.kill: true
+            citygates.admin.button: true
+            citygates.admin.clear: true
+            citygates.admin.show: true
+            citygates.admin.reload: true
+            citygates.admin.setperm: true
+            citygates.admin.setopen: true
+            citygates.admin.setclose: true
+            citygates.admin.addanimation: true
+            citygates.admin.group.create: true
+            citygates.admin.group.del: true
+            citygates.admin.group.add: true
+            citygates.admin.group.remove: true
+            citygates.admin.group.delay: true
+            citygates.admin.group.clear: true
+            citygates.user.open: true
+            citygates.user.close: true
+            citygates.user.info: true
+            citygates.user.list: true
+            citygates.user.help: true
+            citygates.user.gate.*: true
     citygates.user.*:
-      description: Gives acces to all user commands
-      children:
-        citygates.user.open
-        citygates.user.close
-        citygates.user.info
-        citygates.user.list
-        citygates.user.help
+        description: Gives acces to all user commands
+        children:
+            citygates.admin.p1: false
+            citygates.admin.p2: false
+            citygates.admin.show: false
+            citygates.admin.create: false
+            citygates.admin.remove: false
+            citygates.admin.timegate: false
+            citygates.admin.redstone: false
+            citygates.admin.kill: false
+            citygates.admin.button: false
+            citygates.admin.clear: false
+            citygates.admin.show: false
+            citygates.admin.reload: false
+            citygates.admin.setperm: false
+            citygates.admin.setopen: false
+            citygates.admin.setclose: false
+            citygates.admin.addanimation: false
+            citygates.admin.group.create: false
+            citygates.admin.group.del: false
+            citygates.admin.group.add: false
+            citygates.admin.group.remove: false
+            citygates.admin.group.delay: false
+            citygates.admin.group.clear: false
+            citygates.user.open: true
+            citygates.user.close: true
+            citygates.user.info: true
+            citygates.user.list: true
+            citygates.user.help: true
+            citygates.user.gate.*: false
+    citygates.admin.p1:
+        default: op
+    citygates.admin.p2:
+        default: op
+    citygates.admin.create:
+        default: op
+    citygates.admin.show:
+        default: op
+    citygates.admin.remove:
+        default: op
+    citygates.admin.timegate:
+        default: op
+    citygates.admin.redstone:
+        default: op
+    citygates.admin.kill:
+        default: op
+    citygates.admin.button:
+        default: op
+    citygates.admin.clear:
+        default: op
+    citygates.admin.reload:
+        default: op
+    citygates.admin.group.create:
+        default: op
+    citygates.admin.group.del:
+        default: op
+    citygates.admin.group.add:
+        default: op
+    citygates.admin.group.remove:
+        default: op
+    citygates.admin.group.delay:
+        default: op
+    citygates.admin.group.clear:
+        default: op
+    citygates.user.open:
+        default: op
+    citygates.user.close:
+        default: op
+    citygates.user.info:
+        default: op
+    citygates.user.list:
+        default: op
+    citygates.user.help:
+        default: op
+    citygates.admin.setperm:
+        default: op
+    citygates.admin.setclose:
+        default: op
+    citygates.admin.setopen:
+        default: op
+    citygates.admin.addanimation:
+        default: op
+    citygates.user.gate.*:
+        default: op

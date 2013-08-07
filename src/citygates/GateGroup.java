@@ -22,6 +22,7 @@
 /*  28 */   public int[] button = new int[3];
 /*  29 */   public String killMsg = "You slayen a mob :p";
 /*  30 */   public long ButtonInterval = 0L;
+/*  31 */   public boolean openPerm = false; public boolean closePerm = false; public boolean buttonPerm = false; public boolean killPerm = false;
 /*     */ 
 /*     */   public GateGroup(String name, Plugin plugin)
 /*     */   {
@@ -31,137 +32,137 @@
 /*     */ 
 /*     */   public void add(Gate gate)
 /*     */   {
-/*  33 */     this.g.add(gate);
+/*  34 */     this.g.add(gate);
 /*     */   }
 /*     */ 
 /*     */   public void add(GateGroup group) {
-/*  37 */     this.g.add(group);
+/*  38 */     this.g.add(group);
 /*     */   }
 /*     */ 
 /*     */   public void remove(Gate gate) {
-/*  41 */     for (int a = 0; a < this.g.size(); a++)
+/*  42 */     for (int a = 0; a < this.g.size(); a++)
 /*     */       try {
-/*  43 */         Gate gate2 = (Gate)this.g.get(a);
-/*  44 */         if (gate2.gd.name.equals(gate.gd.name))
-/*  45 */           this.g.remove(a);
+/*  44 */         Gate gate2 = (Gate)this.g.get(a);
+/*  45 */         if (gate2.gd.name.equals(gate.gd.name))
+/*  46 */           this.g.remove(a);
 /*     */       }
 /*     */       catch (Exception e) {
 /*     */       }
 /*     */   }
 /*     */ 
 /*     */   public void remove(GateGroup group) {
-/*  52 */     for (int a = 0; a < this.g.size(); a++)
+/*  53 */     for (int a = 0; a < this.g.size(); a++)
 /*     */       try {
-/*  54 */         GateGroup group2 = (GateGroup)this.g.get(a);
-/*  55 */         if (group2.name.equals(group.name))
-/*  56 */           this.g.remove(a);
+/*  55 */         GateGroup group2 = (GateGroup)this.g.get(a);
+/*  56 */         if (group2.name.equals(group.name))
+/*  57 */           this.g.remove(a);
 /*     */       }
 /*     */       catch (Exception e) {
 /*     */       }
 /*     */   }
 /*     */ 
 /*     */   public void setDelay(long time) {
-/*  63 */     this.delay = time;
+/*  64 */     this.delay = time;
 /*     */   }
 /*     */ 
 /*     */   public void Clear() {
-/*  67 */     this.g = new ArrayList();
+/*  68 */     this.g = new ArrayList();
 /*     */   }
 /*     */ 
 /*     */   public void Open() {
-/*  71 */     new Thread(new Runnable() {
+/*  72 */     new Thread(new Runnable() {
 /*     */       public void run() {
-/*  73 */         while (GateGroup.this.inprogress)
+/*  74 */         while (GateGroup.this.inprogress)
 /*     */           try {
-/*  75 */             Thread.sleep(100L);
+/*  76 */             Thread.sleep(100L);
 /*     */           } catch (Exception e) {
 /*     */           }
-/*  78 */         GateGroup.this.open = true;
-/*  79 */         GateGroup.this.inprogress = true;
-/*  80 */         for (int a = 0; a < GateGroup.this.g.size(); a++) {
+/*  79 */         GateGroup.this.open = true;
+/*  80 */         GateGroup.this.inprogress = true;
+/*  81 */         for (int a = 0; a < GateGroup.this.g.size(); a++) {
 /*     */           try {
-/*  82 */             Gate gate = (Gate)GateGroup.this.g.get(a);
-/*  83 */             gate.Open();
+/*  83 */             Gate gate = (Gate)GateGroup.this.g.get(a);
+/*  84 */             gate.Open();
 /*     */           } catch (Exception e) {
 /*     */             try {
-/*  86 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
-/*  87 */               group.Open(); } catch (Exception ee) {
+/*  87 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
+/*  88 */               group.Open(); } catch (Exception ee) {
 /*     */             }
 /*     */           }
 /*     */           try {
-/*  91 */             Thread.sleep(GateGroup.this.delay); } catch (Exception e) {
+/*  92 */             Thread.sleep(GateGroup.this.delay); } catch (Exception e) {
 /*     */           }
 /*     */         }
-/*  94 */         for (int a = 0; a < GateGroup.this.g.size(); a++)
+/*  95 */         for (int a = 0; a < GateGroup.this.g.size(); a++)
 /*     */           try {
-/*  96 */             Gate gate = (Gate)GateGroup.this.g.get(a);
-/*  97 */             gate.Open();
+/*  97 */             Gate gate = (Gate)GateGroup.this.g.get(a);
+/*  98 */             gate.Open();
 /*     */           } catch (Exception e) {
 /*     */             try {
-/* 100 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
-/* 101 */               group.Open();
+/* 101 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
+/* 102 */               group.Open();
 /*     */             } catch (Exception ee) {
 /*     */             }
 /*     */           }
-/* 105 */         GateGroup.this.inprogress = false;
+/* 106 */         GateGroup.this.inprogress = false;
 /*     */       }
 /*     */     }).start();
 /*     */   }
 /*     */ 
 /*     */   public void Close()
 /*     */   {
-/* 111 */     new Thread(new Runnable() {
+/* 112 */     new Thread(new Runnable() {
 /*     */       public void run() {
-/* 113 */         while (GateGroup.this.inprogress)
+/* 114 */         while (GateGroup.this.inprogress)
 /*     */           try {
-/* 115 */             Thread.sleep(100L);
+/* 116 */             Thread.sleep(100L);
 /*     */           } catch (Exception e) {
 /*     */           }
-/* 118 */         GateGroup.this.open = false;
-/* 119 */         GateGroup.this.inprogress = true;
-/* 120 */         for (int a = GateGroup.this.g.size() - 1; a >= 0; a--) {
+/* 119 */         GateGroup.this.open = false;
+/* 120 */         GateGroup.this.inprogress = true;
+/* 121 */         for (int a = GateGroup.this.g.size() - 1; a >= 0; a--) {
 /*     */           try {
-/* 122 */             Gate gate = (Gate)GateGroup.this.g.get(a);
-/* 123 */             gate.Close();
+/* 123 */             Gate gate = (Gate)GateGroup.this.g.get(a);
+/* 124 */             gate.Close();
 /*     */           } catch (Exception e) {
 /*     */             try {
-/* 126 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
-/* 127 */               group.Close(); } catch (Exception ee) {
+/* 127 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
+/* 128 */               group.Close(); } catch (Exception ee) {
 /*     */             }
 /*     */           }
 /*     */           try {
-/* 131 */             Thread.sleep(GateGroup.this.delay); } catch (Exception e) {
+/* 132 */             Thread.sleep(GateGroup.this.delay); } catch (Exception e) {
 /*     */           }
 /*     */         }
-/* 134 */         for (int a = GateGroup.this.g.size() - 1; a >= 0; a--)
+/* 135 */         for (int a = GateGroup.this.g.size() - 1; a >= 0; a--)
 /*     */           try {
-/* 136 */             Gate gate = (Gate)GateGroup.this.g.get(a);
-/* 137 */             gate.Close();
+/* 137 */             Gate gate = (Gate)GateGroup.this.g.get(a);
+/* 138 */             gate.Close();
 /*     */           } catch (Exception e) {
 /*     */             try {
-/* 140 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
-/* 141 */               group.Close();
+/* 141 */               GateGroup group = (GateGroup)GateGroup.this.g.get(a);
+/* 142 */               group.Close();
 /*     */             } catch (Exception ee) {
 /*     */             }
 /*     */           }
-/* 145 */         GateGroup.this.inprogress = false;
+/* 146 */         GateGroup.this.inprogress = false;
 /*     */       }
 /*     */     }).start();
 /*     */   }
 /*     */ 
 /*     */   public void setTime(int time)
 /*     */   {
-/* 151 */     if (time == Time.NACHT) {
-/* 152 */       if (this.open) {
-/* 153 */         Close();
+/* 152 */     if (time == Time.NACHT) {
+/* 153 */       if (this.open) {
+/* 154 */         Close();
 /*     */       }
 /*     */     }
-/* 156 */     else if (!this.open)
-/* 157 */       Open();
+/* 157 */     else if (!this.open)
+/* 158 */       Open();
 /*     */   }
 /*     */ }
 
-/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates.jar
+/* Location:           C:\Users\Logan\Documents\City Gates Decompiles\CityGates (1).jar
  * Qualified Name:     citygates.GateGroup
  * JD-Core Version:    0.6.2
  */
